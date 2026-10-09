@@ -59,16 +59,6 @@
       "requirement_ids": []
     },
     {
-      "rule_id": "template-placeholder",
-      "status": "verified_static_fact",
-      "severity": "high",
-      "path": "specs/001-new/spec.md",
-      "line_start": 21,
-      "requirement_ids": [
-        "FR-001"
-      ]
-    },
-    {
       "rule_id": "missing-edge-cases",
       "status": "hypothesis",
       "severity": "medium",
@@ -83,6 +73,16 @@
       "path": "specs/001-new/spec.md",
       "line_start": 19,
       "requirement_ids": []
+    },
+    {
+      "rule_id": "template-placeholder",
+      "status": "verified_static_fact",
+      "severity": "high",
+      "path": "specs/001-new/spec.md",
+      "line_start": 21,
+      "requirement_ids": [
+        "FR-001"
+      ]
     }
   ]
 }

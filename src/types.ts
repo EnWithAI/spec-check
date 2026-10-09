@@ -62,7 +62,7 @@ export interface Suppression {
   rule_id: string;
   path: string;
   line: number;
-  source: "front-matter" | "comment" | "config";
+  source: "front-matter" | "comment";
 }
 
 /** Something the analysis could not cover, stated explicitly. */
@@ -120,6 +120,8 @@ export interface Report {
     duration_ms: number;
     node_version: string;
     config_source: string;
+    /** Rules turned off in the config (never silently). */
+    disabled_rules: string[];
     language: "en";
     network: false;
     executed_code: false;

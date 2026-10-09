@@ -63,7 +63,7 @@ confirm; `unknown` = cannot decide. No numeric score. Severity and confidence ar
 | `template-placeholder` | clarity | verified_static_fact | high | a Spec Kit 1.1.2 template placeholder is still present (exact list in `src/rules/lexicon.ts`) |
 | `template-placeholder` | clarity | hypothesis | medium | a bracketed phrase looks like a placeholder (`[some words]`, not a link, checkbox, footnote or reference) |
 | `open-marker` | clarity | verified_static_fact | medium | `TBD`, `TODO`, `FIXME`, `XXX` or `???` in requirement, criterion or scenario text |
-| `vague-term` | clarity | hypothesis | low (medium in criteria) | a term from the vague lexicon and no measurable quantity in the same item |
+| `vague-term` | clarity | hypothesis | low | a requirement or scenario uses a term from the vague lexicon and contains no number (criteria are covered by the next rule) |
 | `unmeasurable-criterion` | verifiability | hypothesis | medium | a success criterion with no quantity, threshold or universal quantifier |
 | `scenario-incomplete` | verifiability | verified_static_fact | medium | a Given/When/Then line or Gherkin scenario lacks Given, When or Then, or has them out of order |
 | `story-without-scenarios` | verifiability | verified_static_fact | medium | a Spec Kit user story has no acceptance scenario |
@@ -73,8 +73,9 @@ confirm; `unknown` = cannot decide. No numeric score. Severity and confidence ar
 | `dangling-reference` | integrity | verified_static_fact | medium | an ID is referenced but defined in no input file |
 | `missing-owner` | ownership | verified_static_fact | low | only with `require_owner: true`: no `owner` front matter and no `**Owner**:` line |
 
-"Measurable quantity": a digit, a number word, a percentage, or a universal quantifier (`all`, `every`, `none`,
-`zero`, `never`, `always`). Lexicons are English-only (limitation `english-lexicon`).
+"Number": a digit, a number word or a percentage (IDs such as `FR-001` are ignored). "Measure" (criteria only): a
+number or a universal quantifier (`all`, `every`, `each`, `none`, `no`, `never`, `always`, `only`). Lexicons are
+English-only (limitation `english-lexicon`).
 
 Each finding has: `id` (`<rule>:<sha256-8>` of path, rule and normalized item text, stable across unrelated edits),
 `rule_id`, `category`, `severity`, `status`, `confidence`, `is_heuristic` (`status !== verified_static_fact`),
@@ -121,7 +122,7 @@ Determinism: paths are relative to `--cwd` with `/` separators; findings sorted 
 | S7 | FR-002 defined twice; reference to FR-009 (undefined); reference to SC-001 defined in another file | `duplicate-id`, `dangling-reference` (FR-009 only) |
 | S8 | generic Markdown with MUST bullets, no edge cases, no NFR | inventory without IDs; `missing-edge-cases`, `missing-non-functional` |
 | S9 | adversarial: prompt-injection text, HTML/script, backticks, @mentions, secret, bidi; markers inside code fences and HTML comments; symlink; binary file | injection text has no effect; Markdown escaped; secret redacted; fenced/commented markers ignored; symlink and binary skipped with limitations |
-| S10 | suppression comment + front matter | findings suppressed and listed in `suppressions[]` |
+| S10 | suppression comment + front matter | findings suppressed and listed in `suppressions[]` with the line of the directive or front-matter key |
 | S11 | any | JSON validates against the schema; two runs identical after removing timing fields; SARIF structurally valid |
 | S12 | no input / bad config / bad flag | exit 3 / 2 / 2 with a hint |
 
