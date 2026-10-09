@@ -27,7 +27,13 @@ export interface Config {
 export const DEFAULT_CONFIG: Config = {
   include: ["specs/*/spec.md"],
   exclude: [],
-  idPrefixes: { FR: "functional", REQ: "functional", NFR: "non_functional", SC: "success_criterion", AC: "success_criterion" },
+  idPrefixes: {
+    FR: "functional",
+    REQ: "functional",
+    NFR: "non_functional",
+    SC: "success_criterion",
+    AC: "success_criterion",
+  },
   rules: {},
   failOnSeverity: "high",
   failOnStatuses: ["verified_static_fact"],
@@ -84,7 +90,10 @@ function globs(value: unknown, key: string): string[] {
 /** Validates vague-term additions/removals: plain words only. */
 function words(value: unknown, key: string): string[] {
   if (value === undefined) return [];
-  if (!Array.isArray(value) || value.some((w) => typeof w !== "string" || !/^[A-Za-z][A-Za-z' -]{0,40}$/.test(w)))
+  if (
+    !Array.isArray(value) ||
+    value.some((w) => typeof w !== "string" || !/^[A-Za-z][A-Za-z' -]{0,40}$/.test(w))
+  )
     bad(key, "must be an array of plain words (letters, spaces, hyphens)");
   return (value as string[]).map((w) => w.toLowerCase());
 }
@@ -107,13 +116,15 @@ export function validateConfig(raw: unknown): Config {
     config.idPrefixes = {};
     for (const [prefix, kind] of entries) {
       if (!/^[A-Z]{1,10}$/.test(prefix)) bad(`id_prefixes.${prefix}`, "must be 1–10 upper-case letters");
-      if (typeof kind !== "string" || !KINDS.includes(kind)) bad(`id_prefixes.${prefix}`, `must be one of ${KINDS.join(", ")}`);
+      if (typeof kind !== "string" || !KINDS.includes(kind))
+        bad(`id_prefixes.${prefix}`, `must be one of ${KINDS.join(", ")}`);
       config.idPrefixes[prefix] = kind as RequirementKind;
     }
   }
   if (obj.rules !== undefined) {
     const rules = obj.rules;
-    if (rules === null || typeof rules !== "object" || Array.isArray(rules)) bad("rules", "must be an object");
+    if (rules === null || typeof rules !== "object" || Array.isArray(rules))
+      bad("rules", "must be an object");
     for (const [rule, setting] of Object.entries(rules as Record<string, unknown>)) {
       if (!(RULE_IDS as readonly string[]).includes(rule)) bad(`rules.${rule}`, "is not a known rule ID");
       if (setting === "off") config.rules[rule] = "off";
@@ -129,7 +140,8 @@ export function validateConfig(raw: unknown): Config {
   }
   if (obj.fail_on !== undefined) {
     const failOn = obj.fail_on as Record<string, unknown>;
-    if (failOn === null || typeof failOn !== "object" || Array.isArray(failOn)) bad("fail_on", "must be an object");
+    if (failOn === null || typeof failOn !== "object" || Array.isArray(failOn))
+      bad("fail_on", "must be an object");
     for (const key of Object.keys(failOn))
       if (key !== "severity" && key !== "statuses") bad(`fail_on.${key}`, "is not a known key");
     if (failOn.severity !== undefined) {
@@ -139,7 +151,11 @@ export function validateConfig(raw: unknown): Config {
     }
     if (failOn.statuses !== undefined) {
       const statuses = failOn.statuses;
-      if (!Array.isArray(statuses) || statuses.length === 0 || statuses.some((s) => !STATUSES.includes(s as string)))
+      if (
+        !Array.isArray(statuses) ||
+        statuses.length === 0 ||
+        statuses.some((s) => !STATUSES.includes(s as string))
+      )
         bad("fail_on.statuses", `must be a non-empty array of ${STATUSES.join(", ")}`);
       config.failOnStatuses = [...new Set(statuses as Status[])].sort();
     }
@@ -154,7 +170,8 @@ export function validateConfig(raw: unknown): Config {
   }
   if (obj.vague_terms !== undefined) {
     const vague = obj.vague_terms as Record<string, unknown>;
-    if (vague === null || typeof vague !== "object" || Array.isArray(vague)) bad("vague_terms", "must be an object");
+    if (vague === null || typeof vague !== "object" || Array.isArray(vague))
+      bad("vague_terms", "must be an object");
     for (const key of Object.keys(vague))
       if (key !== "add" && key !== "remove") bad(`vague_terms.${key}`, "is not a known key");
     config.vagueTermsAdd = words(vague.add, "vague_terms.add");

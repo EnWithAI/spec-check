@@ -56,7 +56,8 @@ Privacy: offline; no network access, no telemetry, nothing executed, no model us
 
 /** Writes a report file atomically (temp file + rename); the parent directory must exist. */
 function writeOutput(path: string, content: string): void {
-  if (existsSync(path) && statSync(path).isDirectory()) throw usageError(`--output points to a directory: ${path}`);
+  if (existsSync(path) && statSync(path).isDirectory())
+    throw usageError(`--output points to a directory: ${path}`);
   if (!existsSync(dirname(path))) throw usageError(`Output directory does not exist: ${dirname(path)}`);
   const temp = join(dirname(path), `.spec-check-${process.pid}-${Date.now()}.tmp`);
   writeFileSync(temp, content, { mode: 0o644 });
@@ -71,7 +72,8 @@ export function readSchema(): string {
 /** Rule catalog as a plain-text table. */
 function rulesText(): string {
   const rows = Object.values(RULES).map(
-    (r) => `${r.id.padEnd(26)} ${r.category.padEnd(14)} ${r.status.padEnd(21)} ${r.severity.padEnd(7)} ${r.title}`
+    (r) =>
+      `${r.id.padEnd(26)} ${r.category.padEnd(14)} ${r.status.padEnd(21)} ${r.severity.padEnd(7)} ${r.title}`
   );
   return `${"rule".padEnd(26)} ${"category".padEnd(14)} ${"status".padEnd(21)} ${"severity".padEnd(7)} title\n${rows.join("\n")}\n`;
 }
@@ -135,7 +137,8 @@ async function main(argv: string[], io: CliIO): Promise<number> {
   if (format !== "markdown" && format !== "json" && format !== "sarif")
     throw usageError(`--format must be "markdown", "json" or "sarif"`);
   const cwd = values.cwd ? resolve(io.cwd, values.cwd) : io.cwd;
-  if (!existsSync(cwd) || !statSync(cwd).isDirectory()) throw usageError(`--cwd is not a directory: ${values.cwd ?? cwd}`);
+  if (!existsSync(cwd) || !statSync(cwd).isDirectory())
+    throw usageError(`--cwd is not a directory: ${values.cwd ?? cwd}`);
 
   let config: Config = DEFAULT_CONFIG;
   let configSource = "defaults";
@@ -162,7 +165,8 @@ async function main(argv: string[], io: CliIO): Promise<number> {
       : format === "sarif"
         ? renderSarif(report)
         : renderMarkdown(report, { branding: !values["no-branding"] });
-  if (values.output !== undefined) writeOutput(isAbsolute(values.output) ? values.output : resolve(io.cwd, values.output), rendered);
+  if (values.output !== undefined)
+    writeOutput(isAbsolute(values.output) ? values.output : resolve(io.cwd, values.output), rendered);
   else io.stdout(rendered);
 
   if (!values.quiet) {

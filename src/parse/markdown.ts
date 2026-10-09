@@ -64,7 +64,11 @@ function frontMatter(lines: string[]): { fm: FrontMatter | null; bodyStart: numb
     const line = lines[i] as string;
     if (line.trim() === "" || line.trim().startsWith("#")) continue;
     const m = /^([A-Za-z_][A-Za-z0-9_-]*):\s*(.*?)\s*$/.exec(line);
-    if (m) fm.values[(m[1] as string).toLowerCase()] = { value: (m[2] as string).replace(/^["']|["']$/g, ""), line: i + 1 };
+    if (m)
+      fm.values[(m[1] as string).toLowerCase()] = {
+        value: (m[2] as string).replace(/^["']|["']$/g, ""),
+        line: i + 1,
+      };
     else fm.unsupportedLines++;
   }
   return { fm, bodyStart: end + 1 };
@@ -158,7 +162,10 @@ export function parseMarkdown(source: string): MarkdownDoc {
   let current: Block | null = null;
   const flush = (): void => {
     if (current) {
-      current.text = current.lines.map((l) => l.text.trim()).join(" ").trim();
+      current.text = current.lines
+        .map((l) => l.text.trim())
+        .join(" ")
+        .trim();
       blocks.push(current);
       current = null;
     }
@@ -179,7 +186,10 @@ export function parseMarkdown(source: string): MarkdownDoc {
       flush();
       const level = (heading[1] as string).length;
       const title = (heading[2] ?? "").trim();
-      while (headingStack.length > 0 && (headingStack[headingStack.length - 1] as { level: number }).level >= level)
+      while (
+        headingStack.length > 0 &&
+        (headingStack[headingStack.length - 1] as { level: number }).level >= level
+      )
         headingStack.pop();
       blocks.push({
         type: "heading",

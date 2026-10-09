@@ -64,7 +64,9 @@ export function idPattern(prefixes: readonly string[]): RegExp {
 /** Returns the defined ID when the text starts with `ID:` / `**ID**:` / `**ID:**`. */
 function definedId(text: string, prefixes: readonly string[]): string | null {
   const plain = text.replace(/^\s*(\*\*|__)?/, "");
-  const m = new RegExp(`^(${[...prefixes].sort((a, b) => b.length - a.length).join("|")})-(\\d{1,5})(?:\\*\\*|__)?\\s*[:.–—-]`).exec(plain);
+  const m = new RegExp(
+    `^(${[...prefixes].sort((a, b) => b.length - a.length).join("|")})-(\\d{1,5})(?:\\*\\*|__)?\\s*[:.–—-]`
+  ).exec(plain);
   return m ? `${m[1] as string}-${m[2] as string}` : null;
 }
 
@@ -138,11 +140,7 @@ function gherkinScenarios(md: MarkdownDoc): Scenario[] {
 }
 
 /** Builds the spec model for one file. */
-export function buildSpec(
-  path: string,
-  text: string,
-  idPrefixes: Record<string, RequirementKind>
-): SpecDoc {
+export function buildSpec(path: string, text: string, idPrefixes: Record<string, RequirementKind>): SpecDoc {
   const md = parseMarkdown(text);
   const prefixes = Object.keys(idPrefixes);
   const idRe = idPattern(prefixes);
@@ -154,24 +152,38 @@ export function buildSpec(
 
   const headingBlocks = md.blocks.filter((b) => b.type === "heading");
   const isSpecKit =
-    headingBlocks.some((h) => /^(User Scenarios & Testing|Functional Requirements|Feature Specification:)/i.test(h.text)) ||
-    /(^|\/)spec\.md$/.test(path);
+    headingBlocks.some((h) =>
+      /^(User Scenarios & Testing|Functional Requirements|Feature Specification:)/i.test(h.text)
+    ) || /(^|\/)spec\.md$/.test(path);
 
-  for (const block of md.blocks) {
+  // Table rows are separate items: split paragraphs made only of `|` rows into one block per row.
+  const blocks = md.blocks.flatMap((b) =>
+    b.type === "paragraph" && b.lines.every((l) => l.text.trim().startsWith("|"))
+      ? b.lines.map((l) => ({ ...b, text: l.text.trim(), lineStart: l.line, lineEnd: l.line, lines: [l] }))
+      : [b]
+  );
+  for (const block of blocks) {
     // ID definitions in headings count as definitions (for reference checks) but not as items.
     if (block.type === "heading") {
       const id = definedId(block.text, prefixes);
       if (id) definitions.push({ id, line: block.lineStart, block });
-      if (/^User Story\b/i.test(block.text)) stories.push({ line: block.lineStart, title: block.text, endLine: block.lineStart });
+      if (/^User Story\b/i.test(block.text))
+        stories.push({ line: block.lineStart, title: block.text, endLine: block.lineStart });
       continue;
     }
     const tableId = /^\|\s*(?:\*\*|__)?([A-Z]{1,10}-\d{1,5})(?:\*\*|__)?\s*\|/.exec(block.text);
-    const id = definedId(block.text, prefixes) ?? (tableId && prefixes.some((p) => tableId[1]?.startsWith(`${p}-`)) ? (tableId[1] as string) : null);
+    const id =
+      definedId(block.text, prefixes) ??
+      (tableId && prefixes.some((p) => tableId[1]?.startsWith(`${p}-`)) ? (tableId[1] as string) : null);
     const ownLine = block.lineStart;
     let item: SpecItem | null = null;
     if (id) {
       const prefix = id.slice(0, id.indexOf("-"));
-      const body = stripCodeSpans(tableId && !definedId(block.text, prefixes) ? block.text.replace(/^\|[^|]*\|/, "") : bodyAfterId(block.text));
+      const body = stripCodeSpans(
+        tableId && !definedId(block.text, prefixes)
+          ? block.text.replace(/^\|[^|]*\|/, "")
+          : bodyAfterId(block.text)
+      );
       item = { id, kind: idPrefixes[prefix] as RequirementKind, block, body, references: [] };
       definitions.push({ id, line: ownLine, block });
     } else if (
@@ -196,7 +208,13 @@ export function buildSpec(
     }
     const keywords = scenarioKeywords(block.text);
     if (keywords) {
-      scenarios.push({ lineStart: block.lineStart, lineEnd: block.lineEnd, keywords, text: block.text, gherkin: false });
+      scenarios.push({
+        lineStart: block.lineStart,
+        lineEnd: block.lineEnd,
+        keywords,
+        text: block.text,
+        gherkin: false,
+      });
     }
   }
   scenarios.push(...gherkinScenarios(md));

@@ -76,7 +76,8 @@ function walk(cwd: string, dir: string, depth: number, out: string[], skips: Ski
   for (const entry of entries) {
     const full = resolve(dir, entry.name);
     if (entry.isSymbolicLink()) {
-      if (MARKDOWN.test(entry.name) || !entry.name.includes(".")) skips.add("symlink-skipped", display(cwd, full));
+      if (MARKDOWN.test(entry.name) || !entry.name.includes("."))
+        skips.add("symlink-skipped", display(cwd, full));
     } else if (entry.isDirectory()) {
       if (!SKIP_DIRS.has(entry.name)) walk(cwd, full, depth + 1, out, skips);
     } else if (entry.isFile() && MARKDOWN.test(entry.name)) {
@@ -115,7 +116,11 @@ function readText(cwd: string, absolute: string, skips: Skips): SourceFile | nul
     skips.add("binary-skipped", path);
     return null;
   }
-  return { path, text: text.replace(/^﻿/, ""), sha256: createHash("sha256").update(bytes).digest("hex") };
+  return {
+    path,
+    text: text.replace(/^\ufeff/, ""),
+    sha256: createHash("sha256").update(bytes).digest("hex"),
+  };
 }
 
 /**
@@ -153,7 +158,9 @@ export function discover(cwd: string, paths: string[], include: string[], exclud
   const files = capped.map((file) => readText(cwd, file, skips)).filter((f): f is SourceFile => f !== null);
   if (files.length === 0 && skips.toLimitations().length === 0) {
     throw inputError(
-      paths.length > 0 ? "No Markdown files found in the given paths." : `No spec files match ${include.join(", ")}.`,
+      paths.length > 0
+        ? "No Markdown files found in the given paths."
+        : `No spec files match ${include.join(", ")}.`,
       "Pass paths explicitly, e.g. `spec-check check docs/`, or set `include` in .spec-check.json."
     );
   }

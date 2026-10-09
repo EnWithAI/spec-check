@@ -1,0 +1,457 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/enwithai/spec-check/schema/spec-check-report.schema.json",
+  "title": "Spec Check report",
+  "description": "Deterministic spec verifiability report. Only run_metadata.generated_at and run_metadata.duration_ms vary between identical runs.",
+  "$defs": {
+    "severity": {
+      "enum": ["high", "medium", "low", "info"]
+    },
+    "status": {
+      "enum": ["verified_static_fact", "hypothesis", "unknown"],
+      "description": "verified_static_fact = parser/structural fact; hypothesis = lexical judgement a human must confirm; unknown = cannot decide."
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "line_start", "line_end", "detail", "excerpt"],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "line_start": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "line_end": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "detail": {
+          "type": "string",
+          "description": "Short descriptor such as the matched term or ID."
+        },
+        "excerpt": {
+          "type": ["string", "null"],
+          "maxLength": 170,
+          "description": "Up to 160 characters of the line, secret-redacted; null with --no-excerpts or for document-level evidence."
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "rule_id",
+        "category",
+        "severity",
+        "status",
+        "confidence",
+        "is_heuristic",
+        "summary",
+        "explanation",
+        "recommended_human_action",
+        "evidence",
+        "requirement_ids"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+:[0-9a-f]{8}$"
+        },
+        "rule_id": {
+          "enum": [
+            "needs-clarification",
+            "template-placeholder",
+            "open-marker",
+            "vague-term",
+            "unmeasurable-criterion",
+            "scenario-incomplete",
+            "story-without-scenarios",
+            "missing-edge-cases",
+            "missing-non-functional",
+            "duplicate-id",
+            "dangling-reference",
+            "missing-owner"
+          ]
+        },
+        "category": {
+          "enum": ["clarity", "verifiability", "coverage", "integrity", "ownership"]
+        },
+        "severity": {
+          "$ref": "#/$defs/severity"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "confidence": {
+          "enum": ["high", "medium", "low"]
+        },
+        "is_heuristic": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "explanation": {
+          "type": "string"
+        },
+        "recommended_human_action": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        },
+        "requirement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "path",
+        "line_start",
+        "line_end",
+        "has_measure",
+        "references",
+        "finding_ids"
+      ],
+      "properties": {
+        "id": {
+          "type": ["string", "null"]
+        },
+        "kind": {
+          "enum": ["functional", "non_functional", "success_criterion"]
+        },
+        "path": {
+          "type": "string"
+        },
+        "line_start": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "line_end": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "has_measure": {
+          "type": "boolean"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "finding_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "inputs",
+    "summary",
+    "requirements",
+    "findings",
+    "suppressions",
+    "coverage_limitations",
+    "policy",
+    "run_metadata"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256", "lines", "format", "requirements", "scenarios", "user_stories"],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "lines": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "format": {
+            "enum": ["spec-kit", "markdown"]
+          },
+          "requirements": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "scenarios": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "user_stories": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "files",
+        "requirements",
+        "success_criteria",
+        "scenarios",
+        "user_stories",
+        "findings",
+        "by_severity",
+        "by_status",
+        "suppressed"
+      ],
+      "properties": {
+        "files": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "requirements": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "success_criteria": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scenarios": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "user_stories": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "findings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "by_severity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["high", "medium", "low", "info"],
+          "properties": {
+            "high": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "medium": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "low": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "info": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "by_status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["verified_static_fact", "hypothesis", "unknown"],
+          "properties": {
+            "verified_static_fact": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "hypothesis": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unknown": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "suppressed": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/requirement"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "suppressions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule_id", "path", "line", "source"],
+        "properties": {
+          "rule_id": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "source": {
+            "enum": ["front-matter", "comment"]
+          }
+        }
+      }
+    },
+    "coverage_limitations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "message", "paths", "count"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "message": {
+            "type": "string"
+          },
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evaluated", "result", "fail_on_severity", "fail_on_statuses", "violations"],
+      "properties": {
+        "evaluated": {
+          "type": "boolean"
+        },
+        "result": {
+          "enum": ["pass", "fail", "not_evaluated"]
+        },
+        "fail_on_severity": {
+          "enum": ["high", "medium", "low", "info", "never"]
+        },
+        "fail_on_statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/status"
+          }
+        },
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "IDs of findings that violate the policy."
+        }
+      }
+    },
+    "run_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool",
+        "tool_version",
+        "generated_at",
+        "duration_ms",
+        "node_version",
+        "config_source",
+        "disabled_rules",
+        "language",
+        "network",
+        "executed_code",
+        "model_usage"
+      ],
+      "properties": {
+        "tool": {
+          "const": "spec-check"
+        },
+        "tool_version": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "node_version": {
+          "type": "string"
+        },
+        "config_source": {
+          "type": "string"
+        },
+        "disabled_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "language": {
+          "const": "en"
+        },
+        "network": {
+          "const": false
+        },
+        "executed_code": {
+          "const": false
+        },
+        "model_usage": {
+          "type": "null",
+          "description": "No model or paid API is used. Always null in this version."
+        }
+      }
+    }
+  }
+}

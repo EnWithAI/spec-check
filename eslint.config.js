@@ -28,7 +28,7 @@ export default tseslint.config(
   },
   {
     files: ["test/**/*.ts"],
-    rules: { "@typescript-eslint/no-non-null-assertion": "off" },
+    rules: { "@typescript-eslint/no-non-null-assertion": "off", "no-restricted-imports": "off" },
   },
   {
     files: ["**/*.js", "**/*.mjs"],

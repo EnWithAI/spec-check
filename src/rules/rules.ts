@@ -72,7 +72,8 @@ export const RULES: Record<string, RuleInfo> = {
     confidence: "medium",
     title: "Vague term without a measure",
     explanation: "A term such as 'fast' or 'user-friendly' is used without a number that makes it testable.",
-    action: "Add a measurable threshold (for example a latency, count or percentage) or confirm the wording is intended.",
+    action:
+      "Add a measurable threshold (for example a latency, count or percentage) or confirm the wording is intended.",
   },
   "unmeasurable-criterion": {
     id: "unmeasurable-criterion",
@@ -81,7 +82,8 @@ export const RULES: Record<string, RuleInfo> = {
     severity: "medium",
     confidence: "medium",
     title: "Success criterion without a measure",
-    explanation: "The criterion has no number, threshold or universal quantifier, so success cannot be checked.",
+    explanation:
+      "The criterion has no number, threshold or universal quantifier, so success cannot be checked.",
     action: "State how success is measured: a target value, a percentage or an all/none condition.",
   },
   "scenario-incomplete": {
@@ -91,7 +93,8 @@ export const RULES: Record<string, RuleInfo> = {
     severity: "medium",
     confidence: "high",
     title: "Scenario missing Given, When or Then",
-    explanation: "An acceptance scenario lacks a precondition, an action or an expected outcome, or has them out of order.",
+    explanation:
+      "An acceptance scenario lacks a precondition, an action or an expected outcome, or has them out of order.",
     action: "Complete the scenario so it states the starting state, the action and the observable outcome.",
   },
   "story-without-scenarios": {
@@ -111,8 +114,10 @@ export const RULES: Record<string, RuleInfo> = {
     severity: "medium",
     confidence: "low",
     title: "No edge or negative cases",
-    explanation: "The file has requirements but no edge-case section with content and no error, rejection or boundary wording.",
-    action: "Describe what happens on invalid input, failure, limits and empty states, or confirm none apply.",
+    explanation:
+      "The file has requirements but no edge-case section with content and no error, rejection or boundary wording.",
+    action:
+      "Describe what happens on invalid input, failure, limits and empty states, or confirm none apply.",
   },
   "missing-non-functional": {
     id: "missing-non-functional",
@@ -151,7 +156,8 @@ export const RULES: Record<string, RuleInfo> = {
     severity: "low",
     confidence: "high",
     title: "No owner recorded",
-    explanation: "Neither an `owner` front-matter key nor an **Owner**: line names who decides open questions.",
+    explanation:
+      "Neither an `owner` front-matter key nor an **Owner**: line names who decides open questions.",
     action: "Add `owner:` front matter or an **Owner**: line.",
   },
 };
@@ -231,7 +237,7 @@ function placeholders(doc: SpecDoc): RawFinding[] {
     }
     const generic: string[] = [];
     const code = stripCodeSpans(text);
-    for (const m of code.matchAll(/(?<![!\]\\])\[([^\]\[\n]{3,80})\](?![([:])/g)) {
+    for (const m of code.matchAll(/(?<![!\]\\])\[([^\][\n]{3,80})\](?![([:])/g)) {
       const inner = (m[1] as string).trim();
       if (/^(x|X| )$/.test(inner) || inner.startsWith("^") || inner.startsWith("!")) continue;
       if (/^NEEDS CLARIFICATION/i.test(inner)) continue;
@@ -287,7 +293,9 @@ function openMarkers(doc: SpecDoc): RawFinding[] {
         rule: "open-marker",
         summary: `${[...new Set(markers)].join(", ")} marker${item?.id ? ` in ${item.id}` : ""}`,
         path: doc.path,
-        locations: [{ lineStart: line, lineEnd: line, detail: [...new Set(markers)].join(" "), excerptLine: line }],
+        locations: [
+          { lineStart: line, lineEnd: line, detail: [...new Set(markers)].join(" "), excerptLine: line },
+        ],
         requirementIds: item?.id ? [item.id] : [],
         key: markers.join("|"),
       });
@@ -308,7 +316,9 @@ function vagueTerms(doc: SpecDoc, config: Config): RawFinding[] {
     if (item?.kind === "success_criterion") continue; // covered by unmeasurable-criterion
     const text = stripCodeSpans(item ? item.body : block.text);
     if (hasNumber(text.replace(/\b[A-Z]{1,10}-\d{1,5}\b/g, " "))) continue;
-    const found = [...new Set([...text.matchAll(re)].map((m) => (m[1] as string).toLowerCase().replace(/\s+/g, " ")))].sort();
+    const found = [
+      ...new Set([...text.matchAll(re)].map((m) => (m[1] as string).toLowerCase().replace(/\s+/g, " "))),
+    ].sort();
     if (found.length === 0) continue;
     const single = new RegExp(re.source, "i");
     const line = block.lines.find((l) => single.test(stripCodeSpans(l.text)))?.line ?? block.lineStart;
@@ -316,7 +326,9 @@ function vagueTerms(doc: SpecDoc, config: Config): RawFinding[] {
       rule: "vague-term",
       summary: `Vague ${found.length === 1 ? "term" : "terms"} ${found.map(q).join(", ")} without a measure${item?.id ? ` in ${item.id}` : ""}`,
       path: doc.path,
-      locations: [{ lineStart: block.lineStart, lineEnd: block.lineEnd, detail: found.join(", "), excerptLine: line }],
+      locations: [
+        { lineStart: block.lineStart, lineEnd: block.lineEnd, detail: found.join(", "), excerptLine: line },
+      ],
       requirementIds: item?.id ? [item.id] : [],
       key: found.join("|"),
     });
@@ -332,7 +344,14 @@ function unmeasurableCriteria(doc: SpecDoc): RawFinding[] {
       rule: "unmeasurable-criterion",
       summary: `${i.id ?? "Success criterion"} has no measurable target`,
       path: doc.path,
-      locations: [{ lineStart: i.block.lineStart, lineEnd: i.block.lineEnd, detail: i.id ?? "criterion", excerptLine: i.block.lineStart }],
+      locations: [
+        {
+          lineStart: i.block.lineStart,
+          lineEnd: i.block.lineEnd,
+          detail: i.id ?? "criterion",
+          excerptLine: i.block.lineStart,
+        },
+      ],
       requirementIds: i.id ? [i.id] : [],
       key: i.body,
     }));
@@ -344,7 +363,10 @@ function incompleteScenarios(doc: SpecDoc): RawFinding[] {
   for (const s of doc.scenarios) {
     const first = (["Given", "When", "Then"] as const).map((k) => s.keywords.indexOf(k));
     const missing = (["Given", "When", "Then"] as const).filter((_, i) => first[i] === -1);
-    const ordered = missing.length === 0 && (first[0] as number) < (first[1] as number) && (first[1] as number) < (first[2] as number);
+    const ordered =
+      missing.length === 0 &&
+      (first[0] as number) < (first[1] as number) &&
+      (first[1] as number) < (first[2] as number);
     if (missing.length === 0 && ordered) continue;
     const problem = missing.length > 0 ? `missing ${missing.join(", ")}` : "Given/When/Then out of order";
     const item = itemAt(doc, s.lineStart);
@@ -368,7 +390,9 @@ function storiesWithoutScenarios(doc: SpecDoc): RawFinding[] {
       rule: "story-without-scenarios",
       summary: "User story has no acceptance scenario",
       path: doc.path,
-      locations: [{ lineStart: story.line, lineEnd: story.line, detail: "user story", excerptLine: story.line }],
+      locations: [
+        { lineStart: story.line, lineEnd: story.line, detail: "user story", excerptLine: story.line },
+      ],
       requirementIds: [],
       key: story.title,
     }));
@@ -376,7 +400,11 @@ function storiesWithoutScenarios(doc: SpecDoc): RawFinding[] {
 
 /** True when a block's text is only placeholders or empty after removing them. */
 function isPlaceholderOnly(text: string): boolean {
-  return stripCodeSpans(text).replace(/\[[^\]]*\]/g, "").replace(/[\s.?!:,*_-]/g, "").length === 0;
+  return (
+    stripCodeSpans(text)
+      .replace(/\[[^\]]*\]/g, "")
+      .replace(/[\s.?!:,*_-]/g, "").length === 0
+  );
 }
 
 /** Files with requirements but neither edge-case content nor negative wording. */
@@ -400,7 +428,9 @@ function missingEdgeCases(doc: SpecDoc): RawFinding[] {
       rule: "missing-edge-cases",
       summary: "No edge cases or negative scenarios found",
       path: doc.path,
-      locations: [{ lineStart: doc.anchorLine, lineEnd: doc.anchorLine, detail: "document", excerptLine: null }],
+      locations: [
+        { lineStart: doc.anchorLine, lineEnd: doc.anchorLine, detail: "document", excerptLine: null },
+      ],
       requirementIds: [],
       key: "document",
     },
@@ -418,7 +448,9 @@ function missingNonFunctional(doc: SpecDoc): RawFinding[] {
       rule: "missing-non-functional",
       summary: "No non-functional constraint (performance, security, accessibility, …) mentioned",
       path: doc.path,
-      locations: [{ lineStart: doc.anchorLine, lineEnd: doc.anchorLine, detail: "document", excerptLine: null }],
+      locations: [
+        { lineStart: doc.anchorLine, lineEnd: doc.anchorLine, detail: "document", excerptLine: null },
+      ],
       requirementIds: [],
       key: "document",
     },

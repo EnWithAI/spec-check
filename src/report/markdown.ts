@@ -12,7 +12,12 @@ export interface MarkdownOptions {
 
 const MAX_CHARS = 60_000;
 const MAX_INVENTORY_ROWS = 200;
-const ICON: Record<Severity, string> = { high: "🔴 high", medium: "🟠 medium", low: "🟡 low", info: "🔵 info" };
+const ICON: Record<Severity, string> = {
+  high: "🔴 high",
+  medium: "🟠 medium",
+  low: "🟡 low",
+  info: "🔵 info",
+};
 const STATUS: Record<string, string> = {
   verified_static_fact: "verified",
   hypothesis: "hypothesis",
@@ -41,7 +46,10 @@ export function renderMarkdown(report: Report, options: MarkdownOptions): string
       : `**${report.policy.result}** (fails on ${report.policy.fail_on_severity} severity and above, statuses: ${report.policy.fail_on_statuses.join(", ")}; ${report.policy.violations.length} violation(s))`;
   out.push("| Files | Requirements | Success criteria | Scenarios | User stories | Findings | Suppressed |");
   out.push("|---:|---:|---:|---:|---:|---:|---:|");
-  out.push(`| ${s.files} | ${s.requirements} | ${s.success_criteria} | ${s.scenarios} | ${s.user_stories} | ${s.findings} | ${s.suppressed} |`, "");
+  out.push(
+    `| ${s.files} | ${s.requirements} | ${s.success_criteria} | ${s.scenarios} | ${s.user_stories} | ${s.findings} | ${s.suppressed} |`,
+    ""
+  );
   out.push(
     `Findings by severity: high ${s.by_severity.high} · medium ${s.by_severity.medium} · low ${s.by_severity.low} · info ${s.by_severity.info}. ` +
       `Verified facts ${s.by_status.verified_static_fact} · hypotheses ${s.by_status.hypothesis} · unknown ${s.by_status.unknown}.`,
@@ -85,7 +93,13 @@ export function renderMarkdown(report: Report, options: MarkdownOptions): string
 
   out.push("## Limitations", "");
   for (const l of report.coverage_limitations) {
-    const paths = l.paths.length > 0 ? `: ${l.paths.slice(0, 10).map((p) => code(p)).join(", ")}${l.count > 10 ? " …" : ""}` : "";
+    const paths =
+      l.paths.length > 0
+        ? `: ${l.paths
+            .slice(0, 10)
+            .map((p) => code(p))
+            .join(", ")}${l.count > 10 ? " …" : ""}`
+        : "";
     out.push(`- ${code(l.code)} — ${text(l.message)}${paths}`);
   }
   out.push("");

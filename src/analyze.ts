@@ -44,11 +44,14 @@ function excerpt(lines: string[], line: number | null): string | null {
 }
 
 /** Front-matter and comment suppressions for one file, as (rule, target line | null for whole file). */
-function suppressionsOf(doc: SpecDoc): { rule: string; target: number | null; line: number; source: Suppression["source"] }[] {
+function suppressionsOf(
+  doc: SpecDoc
+): { rule: string; target: number | null; line: number; source: Suppression["source"] }[] {
   const out: { rule: string; target: number | null; line: number; source: Suppression["source"] }[] = [];
   const fm = doc.md.frontMatter?.values.spec_check_disable;
   if (fm) {
-    for (const rule of fm.value.split(/[\s,]+/).filter(Boolean)) out.push({ rule, target: null, line: fm.line, source: "front-matter" });
+    for (const rule of fm.value.split(/[\s,]+/).filter(Boolean))
+      out.push({ rule, target: null, line: fm.line, source: "front-matter" });
   }
   for (const d of doc.md.directives) {
     for (const rule of d.rules) out.push({ rule, target: d.target, line: d.line, source: "comment" });
@@ -80,7 +83,9 @@ export function analyze(options: AnalyzeOptions): Report {
   const kept = raw.filter((f) => {
     const doc = docByPath.get(f.path) as SpecDoc;
     const line = (f.locations[0] as { lineStart: number }).lineStart;
-    const match = suppressionsOf(doc).find((s) => s.rule === f.rule && (s.target === null || s.target === line));
+    const match = suppressionsOf(doc).find(
+      (s) => s.rule === f.rule && (s.target === null || s.target === line)
+    );
     if (!match) return true;
     suppressions.push({ rule_id: f.rule, path: f.path, line: match.line, source: match.source });
     return false;
@@ -128,7 +133,15 @@ export function analyze(options: AnalyzeOptions): Report {
     return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
   });
   suppressions.sort((a, b) =>
-    a.path !== b.path ? (a.path < b.path ? -1 : 1) : a.line !== b.line ? a.line - b.line : a.rule_id < b.rule_id ? -1 : 1
+    a.path !== b.path
+      ? a.path < b.path
+        ? -1
+        : 1
+      : a.line !== b.line
+        ? a.line - b.line
+        : a.rule_id < b.rule_id
+          ? -1
+          : 1
   );
 
   const limitations: Limitation[] = [...discovered.limitations];
@@ -158,7 +171,12 @@ export function analyze(options: AnalyzeOptions): Report {
       finding_ids: findings
         .filter((f) => {
           const e = f.evidence[0] as Finding["evidence"][number];
-          return e.path === doc.path && e.line_start >= item.block.lineStart && e.line_start <= item.block.lineEnd && f.requirement_ids.length > 0;
+          return (
+            e.path === doc.path &&
+            e.line_start >= item.block.lineStart &&
+            e.line_start <= item.block.lineEnd &&
+            f.requirement_ids.length > 0
+          );
         })
         .map((f) => f.id),
     }))
@@ -169,7 +187,8 @@ export function analyze(options: AnalyzeOptions): Report {
   if (noReq.length > 0)
     limitations.push({
       code: "no-requirements-detected",
-      message: "No requirement or success-criterion items were detected in these files; only clarity rules applied.",
+      message:
+        "No requirement or success-criterion items were detected in these files; only clarity rules applied.",
       paths: noReq.slice(0, 50),
       count: noReq.length,
     });
@@ -213,9 +232,14 @@ export function analyze(options: AnalyzeOptions): Report {
   );
   limitations.sort((a, b) => (a.code < b.code ? -1 : a.code > b.code ? 1 : 0));
 
-  const bySeverity = Object.fromEntries(SEVERITY_ORDER.map((s) => [s, findings.filter((f) => f.severity === s).length])) as Record<Severity, number>;
+  const bySeverity = Object.fromEntries(
+    SEVERITY_ORDER.map((s) => [s, findings.filter((f) => f.severity === s).length])
+  ) as Record<Severity, number>;
   const byStatus = Object.fromEntries(
-    (["verified_static_fact", "hypothesis", "unknown"] as Status[]).map((s) => [s, findings.filter((f) => f.status === s).length])
+    (["verified_static_fact", "hypothesis", "unknown"] as Status[]).map((s) => [
+      s,
+      findings.filter((f) => f.status === s).length,
+    ])
   ) as Record<Status, number>;
 
   return {
