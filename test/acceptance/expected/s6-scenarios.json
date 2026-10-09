@@ -1,0 +1,32 @@
+{
+  "args": [
+    "spec.md"
+  ],
+  "policy": "pass",
+  "findings": [
+    {
+      "rule_id": "scenario-incomplete",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": "spec.md",
+      "line_start": 10,
+      "requirement_ids": []
+    },
+    {
+      "rule_id": "story-without-scenarios",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": "spec.md",
+      "line_start": 12,
+      "requirement_ids": []
+    },
+    {
+      "rule_id": "scenario-incomplete",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": "spec.md",
+      "line_start": 25,
+      "requirement_ids": []
+    }
+  ]
+}

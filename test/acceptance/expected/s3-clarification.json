@@ -1,0 +1,16 @@
+{
+  "args": [],
+  "policy": "fail",
+  "findings": [
+    {
+      "rule_id": "needs-clarification",
+      "status": "verified_static_fact",
+      "severity": "high",
+      "path": "specs/002-auth/spec.md",
+      "line_start": 21,
+      "requirement_ids": [
+        "FR-006"
+      ]
+    }
+  ]
+}

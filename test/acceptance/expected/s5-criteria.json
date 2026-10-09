@@ -1,0 +1,18 @@
+{
+  "args": [
+    "spec.md"
+  ],
+  "policy": "pass",
+  "findings": [
+    {
+      "rule_id": "unmeasurable-criterion",
+      "status": "hypothesis",
+      "severity": "medium",
+      "path": "spec.md",
+      "line_start": 10,
+      "requirement_ids": [
+        "SC-001"
+      ]
+    }
+  ]
+}

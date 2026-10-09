@@ -1,0 +1,28 @@
+{
+  "args": [
+    "specs"
+  ],
+  "policy": "fail",
+  "findings": [
+    {
+      "rule_id": "duplicate-id",
+      "status": "verified_static_fact",
+      "severity": "high",
+      "path": "specs/001-a/spec.md",
+      "line_start": 6,
+      "requirement_ids": [
+        "FR-002"
+      ]
+    },
+    {
+      "rule_id": "dangling-reference",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": "specs/001-a/spec.md",
+      "line_start": 8,
+      "requirement_ids": [
+        "FR-003"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "args": [
+    "spec.md"
+  ],
+  "policy": "pass",
+  "findings": [
+    {
+      "rule_id": "vague-term",
+      "status": "hypothesis",
+      "severity": "low",
+      "path": "spec.md",
+      "line_start": 11,
+      "requirement_ids": [
+        "FR-002"
+      ]
+    }
+  ],
+  "suppressions": [
+    {
+      "rule_id": "missing-non-functional",
+      "path": "spec.md",
+      "line": 3,
+      "source": "front-matter"
+    },
+    {
+      "rule_id": "vague-term",
+      "path": "spec.md",
+      "line": 10,
+      "source": "comment"
+    }
+  ]
+}

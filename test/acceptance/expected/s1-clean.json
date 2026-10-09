@@ -1,0 +1,57 @@
+{
+  "args": [],
+  "policy": "pass",
+  "findings": [],
+  "inventory": [
+    [
+      "FR-001",
+      "functional",
+      47,
+      []
+    ],
+    [
+      "FR-002",
+      "functional",
+      48,
+      []
+    ],
+    [
+      "FR-003",
+      "functional",
+      49,
+      [
+        "FR-001"
+      ]
+    ],
+    [
+      "FR-004",
+      "functional",
+      50,
+      []
+    ],
+    [
+      "NFR-001",
+      "non_functional",
+      54,
+      []
+    ],
+    [
+      "NFR-002",
+      "non_functional",
+      55,
+      []
+    ],
+    [
+      "SC-001",
+      "success_criterion",
+      61,
+      []
+    ],
+    [
+      "SC-002",
+      "success_criterion",
+      62,
+      []
+    ]
+  ]
+}

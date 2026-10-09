@@ -1,0 +1,38 @@
+{
+  "args": [
+    "requirements.md"
+  ],
+  "policy": "pass",
+  "findings": [
+    {
+      "rule_id": "missing-edge-cases",
+      "status": "hypothesis",
+      "severity": "medium",
+      "path": "requirements.md",
+      "line_start": 5,
+      "requirement_ids": []
+    },
+    {
+      "rule_id": "missing-non-functional",
+      "status": "hypothesis",
+      "severity": "info",
+      "path": "requirements.md",
+      "line_start": 5,
+      "requirement_ids": []
+    }
+  ],
+  "inventory": [
+    [
+      null,
+      "functional",
+      7,
+      []
+    ],
+    [
+      null,
+      "functional",
+      8,
+      []
+    ]
+  ]
+}

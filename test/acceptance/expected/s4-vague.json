@@ -1,0 +1,28 @@
+{
+  "args": [
+    "spec.md"
+  ],
+  "policy": "pass",
+  "findings": [
+    {
+      "rule_id": "vague-term",
+      "status": "hypothesis",
+      "severity": "low",
+      "path": "spec.md",
+      "line_start": 5,
+      "requirement_ids": [
+        "FR-001"
+      ]
+    },
+    {
+      "rule_id": "vague-term",
+      "status": "hypothesis",
+      "severity": "low",
+      "path": "spec.md",
+      "line_start": 7,
+      "requirement_ids": [
+        "FR-003"
+      ]
+    }
+  ]
+}
