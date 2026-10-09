@@ -125,6 +125,7 @@ Determinism: paths are relative to `--cwd` with `/` separators; findings sorted 
 | S10 | suppression comment + front matter                                                                                                                      | findings suppressed and listed in `suppressions[]` with the line of the directive or front-matter key                                          |
 | S11 | any                                                                                                                                                     | JSON validates against the schema; two runs identical after removing timing fields; SARIF structurally valid                                   |
 | S12 | no input / bad config / bad flag                                                                                                                        | exit 3 / 2 / 2 with a hint                                                                                                                     |
+| S13 | two Spec Kit features that both number FR-001 (added after self-review)                                                                                 | no `duplicate-id`; policy pass                                                                                                                 |
 
 ## 8. Non-goals
 

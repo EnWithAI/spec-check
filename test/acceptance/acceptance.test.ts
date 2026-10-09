@@ -40,8 +40,8 @@ function prepare(name: string): string {
 }
 
 describe("acceptance scenarios (docs/SPEC.md §7)", () => {
-  it("covers S1–S10", () => {
-    expect(cases).toHaveLength(10);
+  it("covers S1–S11", () => {
+    expect(cases).toHaveLength(11);
   });
 
   for (const name of cases) {

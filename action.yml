@@ -1,0 +1,83 @@
+# Spec Check composite GitHub Action. Writes JSON/Markdown/SARIF reports and a job summary for the specs in a
+# repository. Inputs, outputs and the security model are documented below and in docs/ACTION.md.
+
+name: "Spec Check report"
+description: "Offline checks that each requirement in your Markdown/Spec Kit specs is clear and verifiable. Never executes anything."
+author: "EnWithAI Technologies"
+branding:
+  icon: "check-square"
+  color: "blue"
+
+# Security model (see docs/ACTION.md):
+# - Use on `pull_request` with `permissions: contents: read`. Do not use `pull_request_target`.
+# - Spec Check has no runtime dependencies: nothing is installed. It reads Markdown files and writes reports.
+# - Inputs are passed through environment variables, never interpolated into shell code.
+# - A pull request can edit its own .spec-check.json; protect it (and .github/) with CODEOWNERS when blocking.
+inputs:
+  paths:
+    description: "Newline-separated spec files or directories (relative). Default: include globs from the config (specs/*/spec.md)."
+    required: false
+    default: ""
+  working-directory:
+    description: "Directory (relative to the workspace) that paths and the config are resolved against."
+    required: false
+    default: "."
+  config-path:
+    description: "Config path relative to working-directory."
+    required: false
+    default: ".spec-check.json"
+  output-dir:
+    description: "Directory (relative to the workspace) for spec-check-report.{json,md,sarif}."
+    required: false
+    default: "spec-check-report"
+  fail-on-policy:
+    description: "Fail the step when the policy fails (default false: report only)."
+    required: false
+    default: "false"
+  on-error:
+    description: "Tool errors (not policy failures): auto (default; fail when fail-on-policy is true, otherwise warn), fail or warn."
+    required: false
+    default: "auto"
+  excerpts:
+    description: "Quote offending spec lines in reports (default true)."
+    required: false
+    default: "true"
+outputs:
+  report-json:
+    description: "Path of the JSON report (relative to the workspace)."
+    value: ${{ steps.spec-check.outputs.report-json }}
+  report-markdown:
+    description: "Path of the Markdown report."
+    value: ${{ steps.spec-check.outputs.report-markdown }}
+  report-sarif:
+    description: "Path of the SARIF report (upload it with github/codeql-action/upload-sarif if you want code-scanning alerts)."
+    value: ${{ steps.spec-check.outputs.report-sarif }}
+  findings:
+    description: "Number of findings."
+    value: ${{ steps.spec-check.outputs.findings }}
+  high-findings:
+    description: "Number of high-severity findings."
+    value: ${{ steps.spec-check.outputs.high-findings }}
+  policy:
+    description: "passed or failed."
+    value: ${{ steps.spec-check.outputs.policy }}
+  status:
+    description: "ok, or error when on-error let a tool error pass (fail-open)."
+    value: ${{ steps.spec-check.outputs.status }}
+runs:
+  using: "composite"
+  steps:
+    - name: Run Spec Check
+      id: spec-check
+      shell: bash
+      env:
+        INPUT_PATHS: ${{ inputs.paths }}
+        INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
+        INPUT_CONFIG_PATH: ${{ inputs.config-path }}
+        INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
+        INPUT_FAIL_ON_POLICY: ${{ inputs.fail-on-policy }}
+        INPUT_ON_ERROR: ${{ inputs.on-error }}
+        INPUT_EXCERPTS: ${{ inputs.excerpts }}
+      run: |
+        test -f "$GITHUB_ACTION_PATH/dist/action/main.js" || { echo "::error::dist/ is missing in this Spec Check ref; use a release tag"; exit 1; }
+        node "$GITHUB_ACTION_PATH/dist/action/main.js"

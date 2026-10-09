@@ -171,7 +171,14 @@ export interface RawFinding {
   confidence?: Confidence;
   summary: string;
   path: string;
-  locations: { lineStart: number; lineEnd: number; detail: string; excerptLine: number | null }[];
+  /** Evidence locations; `path` defaults to the finding's path (set for multi-file evidence). */
+  locations: {
+    path?: string;
+    lineStart: number;
+    lineEnd: number;
+    detail: string;
+    excerptLine: number | null;
+  }[];
   requirementIds: string[];
   /** Stable text used for the finding ID. */
   key: string;
@@ -490,24 +497,37 @@ export function fileRules(doc: SpecDoc, config: Config): RawFinding[] {
   ];
 }
 
-/** Cross-file integrity rules: duplicate definitions and dangling references. */
-export function setRules(docs: SpecDoc[]): RawFinding[] {
+/**
+ * Integrity rules. Duplicates are counted per file (`id_scope: "file"`, the default: Spec Kit numbers FR-001 per
+ * feature) or across the whole input set (`"set"`). References resolve against every analyzed file in both modes.
+ */
+export function setRules(docs: SpecDoc[], idScope: Config["idScope"]): RawFinding[] {
   const out: RawFinding[] = [];
-  const defs = new Map<string, { path: string; line: number }[]>();
+  const defs = new Map<string, { id: string; path: string; line: number }[]>();
+  const defined = new Set<string>();
   for (const doc of docs)
     for (const d of doc.definitions) {
-      const list = defs.get(d.id) ?? [];
-      list.push({ path: doc.path, line: d.line });
-      defs.set(d.id, list);
+      const key = idScope === "file" ? `${doc.path}\0${d.id}` : d.id;
+      const list = defs.get(key) ?? [];
+      list.push({ id: d.id, path: doc.path, line: d.line });
+      defs.set(key, list);
+      defined.add(d.id);
     }
-  for (const [id, list] of defs) {
+  for (const list of defs.values()) {
+    const id = (list[0] as { id: string }).id;
     if (list.length < 2) continue;
     const sorted = [...list].sort((a, b) => (a.path === b.path ? a.line - b.line : a.path < b.path ? -1 : 1));
     out.push({
       rule: "duplicate-id",
       summary: `${id} is defined ${list.length} times`,
       path: (sorted[0] as { path: string }).path,
-      locations: sorted.map((d) => ({ lineStart: d.line, lineEnd: d.line, detail: id, excerptLine: d.line })),
+      locations: sorted.map((d) => ({
+        path: d.path,
+        lineStart: d.line,
+        lineEnd: d.line,
+        detail: id,
+        excerptLine: d.line,
+      })),
       requirementIds: [id],
       key: id,
     });
@@ -515,7 +535,7 @@ export function setRules(docs: SpecDoc[]): RawFinding[] {
   for (const doc of docs) {
     const seen = new Set<string>();
     for (const ref of doc.references) {
-      if (defs.has(ref.id) || seen.has(`${ref.id}@${ref.line}`)) continue;
+      if (defined.has(ref.id) || seen.has(`${ref.id}@${ref.line}`)) continue;
       seen.add(`${ref.id}@${ref.line}`);
       const item = itemAt(doc, ref.line);
       out.push({

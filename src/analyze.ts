@@ -73,9 +73,10 @@ export function analyze(options: AnalyzeOptions): Report {
     .filter(([, s]) => s === "off")
     .map(([r]) => r)
     .sort();
-  const raw: RawFinding[] = [...docs.flatMap((d) => fileRules(d, config)), ...setRules(docs)].filter(
-    (f) => !disabled.includes(f.rule)
-  );
+  const raw: RawFinding[] = [
+    ...docs.flatMap((d) => fileRules(d, config)),
+    ...setRules(docs, config.idScope),
+  ].filter((f) => !disabled.includes(f.rule));
 
   // Suppressions.
   const suppressions: Suppression[] = [];
@@ -102,7 +103,6 @@ export function analyze(options: AnalyzeOptions): Report {
     let id = `${f.rule}:${hash8(`${f.path}\0${f.rule}\0${f.key.replace(/\s+/g, " ").trim()}`)}`;
     for (let n = 2; usedIds.has(id); n++) id = `${f.rule}:${hash8(`${f.path}\0${f.rule}\0${f.key}\0${n}`)}`;
     usedIds.add(id);
-    const lines = linesByPath.get(f.path) ?? [];
     return {
       id,
       rule_id: f.rule,
@@ -115,11 +115,11 @@ export function analyze(options: AnalyzeOptions): Report {
       explanation: info.explanation,
       recommended_human_action: info.action,
       evidence: f.locations.map((l) => ({
-        path: f.path,
+        path: l.path ?? f.path,
         line_start: l.lineStart,
         line_end: l.lineEnd,
         detail: redact(l.detail),
-        excerpt: options.excerpts ? excerpt(lines, l.excerptLine) : null,
+        excerpt: options.excerpts ? excerpt(linesByPath.get(l.path ?? f.path) ?? [], l.excerptLine) : null,
       })),
       requirement_ids: f.requirementIds,
     };
@@ -156,6 +156,11 @@ export function analyze(options: AnalyzeOptions): Report {
   }
 
   // Requirements inventory.
+  const findingsByPath = new Map<string, Finding[]>();
+  for (const f of findings) {
+    const path = (f.evidence[0] as Finding["evidence"][number]).path;
+    findingsByPath.set(path, [...(findingsByPath.get(path) ?? []), f]);
+  }
   const requirements: Requirement[] = docs.flatMap((doc) =>
     doc.items.map((item) => ({
       id: item.id,
@@ -168,15 +173,10 @@ export function analyze(options: AnalyzeOptions): Report {
           ? hasMeasure(item.body)
           : hasNumber(item.body.replace(/\b[A-Z]{1,10}-\d{1,5}\b/g, " ")),
       references: item.references,
-      finding_ids: findings
+      finding_ids: (findingsByPath.get(doc.path) ?? [])
         .filter((f) => {
-          const e = f.evidence[0] as Finding["evidence"][number];
-          return (
-            e.path === doc.path &&
-            e.line_start >= item.block.lineStart &&
-            e.line_start <= item.block.lineEnd &&
-            f.requirement_ids.length > 0
-          );
+          const line = (f.evidence[0] as Finding["evidence"][number]).line_start;
+          return line >= item.block.lineStart && line <= item.block.lineEnd && f.requirement_ids.length > 0;
         })
         .map((f) => f.id),
     }))

@@ -6,3 +6,4 @@ package-lock.json
 test/fixtures/
 test/acceptance/expected/
 examples/**/output/
+examples/demo/specs/

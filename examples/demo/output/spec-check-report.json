@@ -1,0 +1,266 @@
+{
+  "schema_version": "1.0",
+  "inputs": [
+    {
+      "path": "specs/001-team-invites/spec.md",
+      "sha256": "5f3491a8bb4ba38731d422e84c422df5fd6a0067eac029f77a059b4437c4ce06",
+      "lines": 41,
+      "format": "spec-kit",
+      "requirements": 6,
+      "scenarios": 2,
+      "user_stories": 2
+    }
+  ],
+  "summary": {
+    "files": 1,
+    "requirements": 4,
+    "success_criteria": 2,
+    "scenarios": 2,
+    "user_stories": 2,
+    "findings": 5,
+    "by_severity": {
+      "high": 1,
+      "medium": 3,
+      "low": 1,
+      "info": 0
+    },
+    "by_status": {
+      "verified_static_fact": 3,
+      "hypothesis": 2,
+      "unknown": 0
+    },
+    "suppressed": 0
+  },
+  "requirements": [
+    {
+      "id": "FR-001",
+      "kind": "functional",
+      "path": "specs/001-team-invites/spec.md",
+      "line_start": 32,
+      "line_end": 32,
+      "has_measure": true,
+      "references": [],
+      "finding_ids": []
+    },
+    {
+      "id": "FR-002",
+      "kind": "functional",
+      "path": "specs/001-team-invites/spec.md",
+      "line_start": 33,
+      "line_end": 33,
+      "has_measure": false,
+      "references": [],
+      "finding_ids": [
+        "vague-term:2fdf4c5f"
+      ]
+    },
+    {
+      "id": "FR-003",
+      "kind": "functional",
+      "path": "specs/001-team-invites/spec.md",
+      "line_start": 34,
+      "line_end": 34,
+      "has_measure": true,
+      "references": [
+        "FR-001",
+        "FR-009"
+      ],
+      "finding_ids": [
+        "dangling-reference:4aeb7a47"
+      ]
+    },
+    {
+      "id": "FR-004",
+      "kind": "functional",
+      "path": "specs/001-team-invites/spec.md",
+      "line_start": 35,
+      "line_end": 35,
+      "has_measure": false,
+      "references": [],
+      "finding_ids": [
+        "needs-clarification:589a9698"
+      ]
+    },
+    {
+      "id": "SC-001",
+      "kind": "success_criterion",
+      "path": "specs/001-team-invites/spec.md",
+      "line_start": 39,
+      "line_end": 39,
+      "has_measure": true,
+      "references": [],
+      "finding_ids": []
+    },
+    {
+      "id": "SC-002",
+      "kind": "success_criterion",
+      "path": "specs/001-team-invites/spec.md",
+      "line_start": 40,
+      "line_end": 40,
+      "has_measure": false,
+      "references": [],
+      "finding_ids": [
+        "unmeasurable-criterion:804977b3"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "story-without-scenarios:87ea94ba",
+      "rule_id": "story-without-scenarios",
+      "category": "verifiability",
+      "severity": "medium",
+      "status": "verified_static_fact",
+      "confidence": "high",
+      "is_heuristic": false,
+      "summary": "User story has no acceptance scenario",
+      "explanation": "Nothing in the story's section says how to verify it.",
+      "recommended_human_action": "Add at least one Given/When/Then acceptance scenario to the story.",
+      "evidence": [
+        {
+          "path": "specs/001-team-invites/spec.md",
+          "line_start": 20,
+          "line_end": 20,
+          "detail": "user story",
+          "excerpt": "### User Story 2 - Accept an invitation (Priority: P2)"
+        }
+      ],
+      "requirement_ids": []
+    },
+    {
+      "id": "vague-term:2fdf4c5f",
+      "rule_id": "vague-term",
+      "category": "clarity",
+      "severity": "low",
+      "status": "hypothesis",
+      "confidence": "medium",
+      "is_heuristic": true,
+      "summary": "Vague term \"quickly\" without a measure in FR-002",
+      "explanation": "A term such as 'fast' or 'user-friendly' is used without a number that makes it testable.",
+      "recommended_human_action": "Add a measurable threshold (for example a latency, count or percentage) or confirm the wording is intended.",
+      "evidence": [
+        {
+          "path": "specs/001-team-invites/spec.md",
+          "line_start": 33,
+          "line_end": 33,
+          "detail": "quickly",
+          "excerpt": "- **FR-002**: Invitation emails MUST be sent quickly."
+        }
+      ],
+      "requirement_ids": [
+        "FR-002"
+      ]
+    },
+    {
+      "id": "dangling-reference:4aeb7a47",
+      "rule_id": "dangling-reference",
+      "category": "integrity",
+      "severity": "medium",
+      "status": "verified_static_fact",
+      "confidence": "high",
+      "is_heuristic": false,
+      "summary": "FR-009 is referenced but not defined",
+      "explanation": "The ID is mentioned but defined in none of the analyzed files.",
+      "recommended_human_action": "Define the referenced requirement, fix the ID, or include the file that defines it in the run.",
+      "evidence": [
+        {
+          "path": "specs/001-team-invites/spec.md",
+          "line_start": 34,
+          "line_end": 34,
+          "detail": "FR-009",
+          "excerpt": "- **FR-003**: Invitations MUST expire after 7 days (see FR-001 and FR-009)."
+        }
+      ],
+      "requirement_ids": [
+        "FR-003"
+      ]
+    },
+    {
+      "id": "needs-clarification:589a9698",
+      "rule_id": "needs-clarification",
+      "category": "clarity",
+      "severity": "high",
+      "status": "verified_static_fact",
+      "confidence": "high",
+      "is_heuristic": false,
+      "summary": "Unresolved clarification in FR-004",
+      "explanation": "The spec itself marks this point as unresolved; building from it means guessing.",
+      "recommended_human_action": "Resolve the question with the requirement owner and replace the marker with the decision.",
+      "evidence": [
+        {
+          "path": "specs/001-team-invites/spec.md",
+          "line_start": 35,
+          "line_end": 35,
+          "detail": "NEEDS CLARIFICATION",
+          "excerpt": "- **FR-004**: The system MUST authenticate invitees via [NEEDS CLARIFICATION: SSO only, or email + password too?]"
+        }
+      ],
+      "requirement_ids": [
+        "FR-004"
+      ]
+    },
+    {
+      "id": "unmeasurable-criterion:804977b3",
+      "rule_id": "unmeasurable-criterion",
+      "category": "verifiability",
+      "severity": "medium",
+      "status": "hypothesis",
+      "confidence": "medium",
+      "is_heuristic": true,
+      "summary": "SC-002 has no measurable target",
+      "explanation": "The criterion has no number, threshold or universal quantifier, so success cannot be checked.",
+      "recommended_human_action": "State how success is measured: a target value, a percentage or an all/none condition.",
+      "evidence": [
+        {
+          "path": "specs/001-team-invites/spec.md",
+          "line_start": 40,
+          "line_end": 40,
+          "detail": "SC-002",
+          "excerpt": "- **SC-002**: Admins find inviting people easier than before."
+        }
+      ],
+      "requirement_ids": [
+        "SC-002"
+      ]
+    }
+  ],
+  "suppressions": [],
+  "coverage_limitations": [
+    {
+      "code": "english-lexicon",
+      "message": "Vague-term, measure and coverage heuristics use English word lists.",
+      "paths": [],
+      "count": 0
+    },
+    {
+      "code": "not-checked",
+      "message": "Section structure, requirement-to-test traceability and logical completeness are not checked. A clean report does not mean the spec is complete or correct.",
+      "paths": [],
+      "count": 0
+    }
+  ],
+  "policy": {
+    "evaluated": true,
+    "result": "fail",
+    "fail_on_severity": "high",
+    "fail_on_statuses": [
+      "verified_static_fact"
+    ],
+    "violations": [
+      "needs-clarification:589a9698"
+    ]
+  },
+  "run_metadata": {
+    "tool": "spec-check",
+    "tool_version": "0.1.0-alpha.0",
+    "generated_at": "2026-01-01T00:00:00.000Z",
+    "duration_ms": 0,
+    "node_version": "normalized",
+    "config_source": "defaults",
+    "disabled_rules": [],
+    "language": "en",
+    "network": false,
+    "executed_code": false,
+    "model_usage": null
+  }
+}

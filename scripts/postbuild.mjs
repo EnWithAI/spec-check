@@ -3,3 +3,4 @@
  */
 import { chmodSync } from "node:fs";
 chmodSync(new URL("../dist/cli/main.js", import.meta.url), 0o755);
+chmodSync(new URL("../dist/action/main.js", import.meta.url), 0o755);

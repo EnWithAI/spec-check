@@ -21,6 +21,8 @@ export interface Config {
   vagueTermsAdd: string[];
   vagueTermsRemove: string[];
   excerpts: boolean;
+  /** Where requirement IDs must be unique: per file (Spec Kit) or across all inputs. */
+  idScope: "file" | "set";
 }
 
 /** Defaults used when no config file exists. */
@@ -41,6 +43,7 @@ export const DEFAULT_CONFIG: Config = {
   vagueTermsAdd: [],
   vagueTermsRemove: [],
   excerpts: true,
+  idScope: "file",
 };
 
 /** Every rule ID Spec Check knows (used to validate `rules` keys and suppression directives). */
@@ -72,6 +75,7 @@ const KEYS = [
   "require_owner",
   "vague_terms",
   "excerpts",
+  "id_scope",
 ];
 
 /** Throws a usage error naming the offending config key. */
@@ -167,6 +171,10 @@ export function validateConfig(raw: unknown): Config {
   if (obj.excerpts !== undefined) {
     if (typeof obj.excerpts !== "boolean") bad("excerpts", "must be a boolean");
     config.excerpts = obj.excerpts;
+  }
+  if (obj.id_scope !== undefined) {
+    if (obj.id_scope !== "file" && obj.id_scope !== "set") bad("id_scope", 'must be "file" or "set"');
+    config.idScope = obj.id_scope;
   }
   if (obj.vague_terms !== undefined) {
     const vague = obj.vague_terms as Record<string, unknown>;

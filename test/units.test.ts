@@ -2,7 +2,7 @@
  * Parser and rule edge cases: front matter, comments, fences, CRLF/BOM, table and heading IDs, Gherkin
  * backgrounds, scenario order, placeholder exclusions, owner rule, caps and discovery.
  */
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { validateConfig } from "../src/config.js";
@@ -125,6 +125,25 @@ describe("rules", () => {
     ]);
   });
 
+  it('id_scope: per-file by default (Spec Kit numbering); "set" flags cross-file duplicates', async () => {
+    const spec = `${REQ}- **FR-001**: Must work.\n${OK_TAIL}`;
+    const files = { "specs/001-a/spec.md": spec, "specs/002-b/spec.md": spec };
+    expect(await rules(files, ["specs"])).toEqual([]);
+    const report = await analyzeJson(
+      tempSpecs({ ...files, ".spec-check.json": JSON.stringify({ id_scope: "set" }) }),
+      ["specs"]
+    );
+    const dups = report.findings
+      .filter((f) => f.rule_id === "duplicate-id")
+      .map((f) => f.requirement_ids[0])
+      .sort();
+    expect(dups).toEqual(["FR-001", "NFR-001"]);
+    expect(report.findings.find((f) => f.rule_id === "duplicate-id")!.evidence.map((e) => e.path)).toEqual([
+      "specs/001-a/spec.md",
+      "specs/002-b/spec.md",
+    ]);
+  });
+
   it("unknown suppression rule IDs are reported as a limitation", async () => {
     const report = await analyzeJson(
       tempSpecs({
@@ -175,6 +194,11 @@ describe("discovery and caps", () => {
 });
 
 describe("config validation", () => {
+  it("the documented example config is valid", () => {
+    const example = JSON.parse(readFileSync(new URL("../.spec-check.example.json", import.meta.url), "utf8"));
+    expect(validateConfig(example).requireOwner).toBe(false);
+  });
+
   it("accepts a full valid config and rejects bad values", () => {
     const config = validateConfig({
       include: ["docs/**/*.md"],
@@ -199,6 +223,7 @@ describe("config validation", () => {
       { excerpts: 1 },
       { vague_terms: { add: ["(.*)"] } },
       { vague_terms: { other: [] } },
+      { id_scope: "global" },
     ]) {
       expect(() => validateConfig(bad), JSON.stringify(bad)).toThrow(/Invalid config/);
     }

@@ -1,0 +1,26 @@
+{
+  "include": ["specs/*/spec.md", "docs/requirements/**/*.md"],
+  "exclude": ["specs/**/archive/**"],
+  "id_prefixes": {
+    "FR": "functional",
+    "NFR": "non_functional",
+    "SC": "success_criterion"
+  },
+  "rules": {
+    "missing-non-functional": "off",
+    "open-marker": {
+      "severity": "low"
+    }
+  },
+  "fail_on": {
+    "severity": "high",
+    "statuses": ["verified_static_fact"]
+  },
+  "require_owner": false,
+  "vague_terms": {
+    "add": ["snappy"],
+    "remove": ["minimal"]
+  },
+  "excerpts": true,
+  "id_scope": "file"
+}
