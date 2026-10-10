@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Word lists used by the rules. English only (limitation `english-lexicon`). Changing a list changes findings,
  * so every change needs a fixture update first (docs/SPEC.md, verification-first).

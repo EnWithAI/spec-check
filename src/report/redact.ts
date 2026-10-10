@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 // Masks token-like strings in any spec-derived text before it is rendered.
 // Spec Check quotes short excerpts of spec lines, so secrets pasted into a spec must be masked.
 

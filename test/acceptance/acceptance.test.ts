@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Acceptance scenarios S1–S10 (docs/SPEC.md §7). Expectations in test/acceptance/expected/ were written by hand
  * from the specification before the analyzers existed (verification-first). A rule change must update them first.

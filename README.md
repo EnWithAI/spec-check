@@ -21,7 +21,7 @@ Every finding has a `status`: `verified_static_fact` (a structural fact, such as
 Requires Node.js 22, 24 or ≥ 26. No runtime dependencies.
 
 ```bash
-git clone <this repository> spec-check && cd spec-check
+git clone https://github.com/enwithai/spec-check.git spec-check && cd spec-check
 npm ci --ignore-scripts && npm run build
 cd examples/demo && node ../../dist/cli/main.js check
 ```
@@ -41,13 +41,13 @@ The exit code is `4`: the demo spec has an unresolved clarification, which the d
 
 ## Install
 
-Until a release is published, install from a local build:
-
 ```bash
-npm ci --ignore-scripts && npm run build && npm pack
-npm install --global ./enwithai-spec-check-0.1.0-alpha.0.tgz
+npm install --global @enwithai/spec-check@alpha
 spec-check --help
 ```
+
+Alpha releases are published under the `alpha` dist-tag. To build from source instead:
+`git clone https://github.com/enwithai/spec-check.git && cd spec-check && npm ci --ignore-scripts && npm run build`.
 
 Uninstall with `npm uninstall --global @enwithai/spec-check`. Spec Check stores nothing outside the report files you ask for.
 
@@ -122,4 +122,12 @@ MIT © EnWithAI Technologies. Not affiliated with or endorsed by GitHub or the S
 
 ---
 
-<sub>Built by EnWithAI · Part of CrewPE Engineering Commons · [crewpe.ai](https://crewpe.ai) · Enterprise advisory: [NetworkGain](https://networkgain.com)</sub>
+<sub>**Check the spec. Check the impact. Check the outcome.** Spec Check is one of three checks, with
+[Impact Check](https://github.com/enwithai/impact-check) and [Outcome Check](https://github.com/enwithai/outcome-check).</sub>
+
+<sub>An **EnWithAI Engineering Commons** initiative. Developed and maintained by EnWithAI Technologies, contributing to
+open, verifiable and accountable AI-assisted software engineering. Part of the broader [CrewPE](https://crewpe.ai)
+engineering ecosystem. Spec Check is independently usable and does not require CrewPE. Enterprise advisory and
+transformation perspectives are supported through [NetworkGain Consulting](https://networkgain.com).
+Attribution: [ATTRIBUTION.md](ATTRIBUTION.md) · Notices: [NOTICE.md](NOTICE.md) · Trademarks:
+[TRADEMARKS.md](TRADEMARKS.md) · References: [REFERENCES.md](REFERENCES.md).</sub>

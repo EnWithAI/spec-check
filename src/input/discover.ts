@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Input discovery and reading: resolves positional paths or include globs to Markdown files, never follows
  * symlinks, skips binary/non-UTF-8 and oversized files, and caps the file count. Every skip becomes a limitation.

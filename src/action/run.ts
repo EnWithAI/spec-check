@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * GitHub Action runner (docs/ACTION.md). Reads inputs from INPUT_* environment variables (never from shell
  * interpolation), analyzes in-process, writes JSON/Markdown/SARIF files, the job summary and step outputs.

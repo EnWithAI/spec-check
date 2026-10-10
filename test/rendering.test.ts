@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Untrusted spec content (S9): prompt-injection text has no effect, Markdown/HTML is escaped, @mentions are
  * neutralized, secrets are redacted, control/bidi characters are visible, and excerpts can be disabled.
@@ -5,7 +7,7 @@
 import { readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { analyzeJson, cli, copyFixture } from "./helpers.js";
+import { analyzeJson, cli, copyFixture, FAKE_GITHUB_TOKEN } from "./helpers.js";
 
 function adversarial(): string {
   const dir = copyFixture("s9-adversarial");
@@ -19,7 +21,7 @@ describe("untrusted spec content (S9)", () => {
     const md = result.stdout;
     expect(md).not.toMatch(/<script|<img|onerror=alert\(1\)>/);
     expect(md).not.toMatch(/(^|[^`\u200b])@maintainers/m);
-    expect(md).not.toContain("ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+    expect(md).not.toContain(FAKE_GITHUB_TOKEN);
     expect(md).toContain("[REDACTED]");
     expect(md).not.toMatch(/[\u202a-\u202e\u2066-\u2069]/);
     expect(md).not.toContain("crewpe.ai");
@@ -28,7 +30,7 @@ describe("untrusted spec content (S9)", () => {
   it("secrets are redacted in JSON excerpts too; injection text does not change results", async () => {
     const report = await analyzeJson(adversarial(), ["specs"]);
     const text = JSON.stringify(report);
-    expect(text).not.toContain("ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+    expect(text).not.toContain(FAKE_GITHUB_TOKEN);
     expect(report.findings.map((f) => f.rule_id)).toEqual(["open-marker", "needs-clarification"]);
     expect(report.run_metadata.executed_code).toBe(false);
     expect(report.run_metadata.network).toBe(false);
@@ -73,7 +75,7 @@ describe("untrusted spec content (S9)", () => {
     expect(md).toContain("## Requirements inventory");
     expect(md).toContain("## Suppressions");
     expect(md).toContain("`not-checked`");
-    expect(md).toContain("Built by EnWithAI");
+    expect(md).toContain("An EnWithAI Engineering Commons tool");
     expect(md).toContain("Passing Spec Check does not mean a spec is complete or correct.");
   });
 });

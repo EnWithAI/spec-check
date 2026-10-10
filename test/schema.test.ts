@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Report contract: JSON Schema validation for every acceptance fixture, determinism across runs and locations,
  * SARIF structure, and the schema/rules commands.

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Line-based Markdown model (docs/SPEC.md §3): front matter, ATX headings, list items with continuation lines,
  * paragraphs, fenced code (kept only for Gherkin), HTML comments (removed, except suppression directives).

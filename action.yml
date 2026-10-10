@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 # Spec Check composite GitHub Action. Writes JSON/Markdown/SARIF reports and a job summary for the specs in a
 # repository. Inputs, outputs and the security model are documented below and in docs/ACTION.md.
 

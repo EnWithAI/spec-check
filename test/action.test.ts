@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * GitHub Action runner: report files, job summary and outputs; report-only vs blocking policy; explicit
  * fail-open/fail-closed error handling; input validation (relative paths only, strict booleans).

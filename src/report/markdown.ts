@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Markdown reporter. Every spec-derived string is untrusted: excerpts and paths go into code spans, free text is
  * escaped, @mentions are neutralized and control/bidi characters made visible (src/report/escape.ts).
@@ -106,7 +108,7 @@ export function renderMarkdown(report: Report, options: MarkdownOptions): string
   out.push(
     `<sub>Spec Check ${text(report.run_metadata.tool_version)} · offline · no code executed · no model used.` +
       (options.branding
-        ? " Built by EnWithAI · Part of CrewPE Engineering Commons · [crewpe.ai](https://crewpe.ai)</sub>"
+        ? " An EnWithAI Engineering Commons tool · [crewpe.ai](https://crewpe.ai)</sub>"
         : "</sub>"),
     ""
   );

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Policy evaluation for `spec-check check`. By default only verified high-severity findings block
  * (docs/SPEC.md §6); hypotheses block only when the config opts in.

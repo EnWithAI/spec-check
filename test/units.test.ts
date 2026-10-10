@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Parser and rule edge cases: front matter, comments, fences, CRLF/BOM, table and heading IDs, Gherkin
  * backgrounds, scenario order, placeholder exclusions, owner rule, caps and discovery.

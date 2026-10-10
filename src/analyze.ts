@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Analysis pipeline: discover inputs → build spec models → run rules → apply config overrides and suppressions →
  * assign stable IDs → sort → build the requirements inventory, summary, limitations and policy result.

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Rule catalog and rule evaluation (docs/SPEC.md §5). Rules return raw findings with locations; the analyzer
  * assigns IDs, applies suppressions and sorts. Every rule is either a structural fact (verified_static_fact) or a

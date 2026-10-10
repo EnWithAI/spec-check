@@ -1,7 +1,9 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Test helpers: run the CLI in-process, copy fixtures into temporary directories and load reports.
  */
-import { cpSync, mkdtempSync, writeFileSync, mkdirSync } from "node:fs";
+import { cpSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -32,10 +34,30 @@ export async function cli(args: string[], cwd: string): Promise<CliResult> {
   return { code, stdout, stderr };
 }
 
+/**
+ * A fake token in GitHub's format, assembled at run time so that no token-shaped string is committed (keeps secret
+ * scanning and push protection quiet). Fixtures reference it as __FAKE_GITHUB_TOKEN__.
+ */
+export const FAKE_GITHUB_TOKEN = ["ghp", "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"].join("_");
+
+/** Replaces the fake-token placeholder in every file under a directory. */
+function injectFakeToken(dir: string): void {
+  for (const name of readdirSync(dir)) {
+    const path = join(dir, name);
+    if (statSync(path).isDirectory()) injectFakeToken(path);
+    else {
+      const text = readFileSync(path, "utf8");
+      if (text.includes("__FAKE_GITHUB_TOKEN__"))
+        writeFileSync(path, text.replaceAll("__FAKE_GITHUB_TOKEN__", FAKE_GITHUB_TOKEN));
+    }
+  }
+}
+
 /** Copies a fixture into a fresh temporary directory and returns its path. */
 export function copyFixture(name: string): string {
   const dir = mkdtempSync(join(tmpdir(), "spec-check-"));
   cpSync(fixture(name), dir, { recursive: true, verbatimSymlinks: true });
+  injectFakeToken(dir);
   return dir;
 }
 

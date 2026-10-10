@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Spec model built from Markdown blocks: requirement items (ID-defined or, in generic Markdown, MUST/SHALL items
  * under a "requirements" heading), ID definitions and references, Given/When/Then scenarios, Gherkin scenarios

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * SARIF 2.1.0 reporter for code-scanning tools. Levels: high → error, medium → warning, low/info → note.
  * Status, confidence and is_heuristic are kept in result properties so hypotheses stay labelled.

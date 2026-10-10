@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 EnWithAI Technologies
 /**
  * Executable entry point of the GitHub Action (action.yml). Delegates to runAction() and sets the exit code.
  */
