@@ -6,10 +6,11 @@ Only the latest `0.x` alpha receives fixes.
 
 ## Reporting a vulnerability
 
+Security contact: **Koushik Ramani** ([@aiwithrk](https://github.com/aiwithrk)), maintainer, EnWithAI Technologies.
+
 Please **do not open a public issue**. Use GitHub's private vulnerability reporting ("Report a vulnerability" on the
-Security tab) once the repository is public. Include the Spec Check version, the command and a minimal synthetic
-spec. Never include real secrets or proprietary documents. We aim to acknowledge within 5 business days. _(Private
-reporting is enabled at publication time; until then report directly to the maintainers at EnWithAI.)_
+Security tab). Include the Spec Check version, the command and a minimal synthetic
+spec. Never include real secrets or proprietary documents. We aim to acknowledge within 5 business days.
 
 ## Security properties Spec Check is designed to keep
 
