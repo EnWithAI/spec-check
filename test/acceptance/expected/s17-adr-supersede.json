@@ -1,0 +1,22 @@
+{
+  "args": [],
+  "policy": "pass",
+  "findings": [
+    {
+      "rule_id": "adr-supersede-dangling",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": "docs/adr/0001-use-rest.md",
+      "line_start": 5,
+      "requirement_ids": []
+    },
+    {
+      "rule_id": "adr-supersede-dangling",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": "docs/adr/0002-use-grpc.md",
+      "line_start": 5,
+      "requirement_ids": []
+    }
+  ]
+}

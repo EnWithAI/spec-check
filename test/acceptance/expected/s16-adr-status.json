@@ -1,0 +1,14 @@
+{
+  "args": [],
+  "policy": "pass",
+  "findings": [
+    {
+      "rule_id": "adr-status-invalid",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": "docs/adr/0001-use-rest.md",
+      "line_start": 5,
+      "requirement_ids": []
+    }
+  ]
+}

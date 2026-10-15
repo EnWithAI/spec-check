@@ -1,0 +1,22 @@
+{
+  "args": [],
+  "policy": "pass",
+  "findings": [
+    {
+      "rule_id": "adr-section-missing",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": "docs/adr/0001-use-kafka.md",
+      "line_start": 1,
+      "requirement_ids": []
+    },
+    {
+      "rule_id": "adr-section-missing",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": "docs/adr/0002-cache-invitations.md",
+      "line_start": 1,
+      "requirement_ids": []
+    }
+  ]
+}

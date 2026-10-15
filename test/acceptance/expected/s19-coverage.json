@@ -1,0 +1,30 @@
+{
+  "args": [],
+  "policy": "pass",
+  "findings": [
+    {
+      "rule_id": "ai-governance-missing",
+      "status": "hypothesis",
+      "severity": "medium",
+      "path": "specs/001-assistant/spec.md",
+      "line_start": 5,
+      "requirement_ids": []
+    },
+    {
+      "rule_id": "security-considerations-missing",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": "specs/001-assistant/spec.md",
+      "line_start": 7,
+      "requirement_ids": []
+    },
+    {
+      "rule_id": "security-considerations-missing",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": "specs/002-export/spec.md",
+      "line_start": 3,
+      "requirement_ids": []
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "profile": "design-package",
+  "include": [
+    "specs/*/*.md"
+  ]
+}

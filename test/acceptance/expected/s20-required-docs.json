@@ -1,0 +1,22 @@
+{
+  "args": [],
+  "policy": "pass",
+  "findings": [
+    {
+      "rule_id": "design-package-incomplete",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": ".spec-check.json",
+      "line_start": 1,
+      "requirement_ids": []
+    },
+    {
+      "rule_id": "design-package-incomplete",
+      "status": "verified_static_fact",
+      "severity": "medium",
+      "path": ".spec-check.json",
+      "line_start": 1,
+      "requirement_ids": []
+    }
+  ]
+}

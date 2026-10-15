@@ -1,0 +1,9 @@
+{
+  "profile": "design-package",
+  "include": [
+    "specs/*/*.md"
+  ],
+  "design_package": {
+    "required_documents": {}
+  }
+}
