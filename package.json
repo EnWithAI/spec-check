@@ -1,6 +1,6 @@
 {
   "name": "@enwithai/spec-check",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Deterministic, offline checks that each requirement in a Markdown or Spec Kit spec is clear and verifiable.",
   "license": "MIT",
   "author": "EnWithAI Technologies",
