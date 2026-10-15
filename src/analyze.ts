@@ -6,10 +6,11 @@
  */
 import { createHash } from "node:crypto";
 import type { Config } from "./config.js";
-import { discover } from "./input/discover.js";
+import { discover, listFiles } from "./input/discover.js";
 import { buildSpec, type SpecDoc } from "./parse/spec.js";
 import { evaluatePolicy, notEvaluated } from "./policy.js";
 import { redact } from "./report/redact.js";
+import { designRules } from "./rules/design.js";
 import { hasMeasure, hasNumber } from "./rules/lexicon.js";
 import { fileRules, RULES, setRules, type RawFinding } from "./rules/rules.js";
 import type { Finding, Limitation, Report, Requirement, Severity, Status, Suppression } from "./types.js";
@@ -21,6 +22,8 @@ export interface AnalyzeOptions {
   paths: string[];
   config: Config;
   configSource: string;
+  /** Display path of the config file (evidence for `design-package-incomplete`). */
+  configPath?: string;
   /** Apply the policy (check command). */
   policy: boolean;
   excerpts: boolean;
@@ -66,7 +69,9 @@ export function analyze(options: AnalyzeOptions): Report {
   const now = options.now ?? (() => new Date());
   const started = Date.now();
   const { config } = options;
-  const discovered = discover(options.cwd, options.paths, config.include, config.exclude);
+  const designPackage = config.profile === "design-package";
+  const include = designPackage ? [...config.include, ...config.designPackage.adrPaths] : config.include;
+  const discovered = discover(options.cwd, options.paths, include, config.exclude);
   const docs = discovered.files.map((f) => buildSpec(f.path, f.text, config.idPrefixes));
   const linesByPath = new Map(discovered.files.map((f) => [f.path, f.text.split(/\r?\n/)]));
   const docByPath = new Map(docs.map((d) => [d.path, d]));
@@ -75,16 +80,24 @@ export function analyze(options: AnalyzeOptions): Report {
     .filter(([, s]) => s === "off")
     .map(([r]) => r)
     .sort();
+  let fileList: ReturnType<typeof listFiles> | null = null;
   const raw: RawFinding[] = [
     ...docs.flatMap((d) => fileRules(d, config)),
     ...setRules(docs, config.idScope),
+    ...(designPackage
+      ? designRules(docs, config, {
+          files: (fileList ??= listFiles(options.cwd)).paths,
+          configPath: options.configPath ?? ".spec-check.json",
+        })
+      : []),
   ].filter((f) => !disabled.includes(f.rule));
 
   // Suppressions.
   const suppressions: Suppression[] = [];
   const unknownDirectives: string[] = [];
   const kept = raw.filter((f) => {
-    const doc = docByPath.get(f.path) as SpecDoc;
+    const doc = docByPath.get(f.path);
+    if (!doc) return true; // evidence outside the analyzed files (the config file)
     const line = (f.locations[0] as { lineStart: number }).lineStart;
     const match = suppressionsOf(doc).find(
       (s) => s.rule === f.rule && (s.target === null || s.target === line)
@@ -217,6 +230,22 @@ export function analyze(options: AnalyzeOptions): Report {
       paths: [...new Set(unknownDirectives)].sort(),
       count: unknownDirectives.length,
     });
+  if (designPackage) {
+    limitations.push({
+      code: "design-package-content",
+      message:
+        "The design-package profile checks that ADR sections, service-level targets and security and AI-governance headings exist. It does not judge whether their content is adequate, and its default headings are not a compliance claim.",
+      paths: [],
+      count: 0,
+    });
+    if (fileList?.capped)
+      limitations.push({
+        code: "file-list-cap",
+        message: "Only the first 20,000 files were listed when looking for required documents.",
+        paths: [],
+        count: 1,
+      });
+  }
   limitations.push(
     {
       code: "english-lexicon",

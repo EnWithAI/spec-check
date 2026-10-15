@@ -67,6 +67,7 @@ export function runAction(io: ActionIO): number {
       paths,
       config,
       configSource,
+      configPath,
       policy: true,
       excerpts: config.excerpts && input("EXCERPTS", "true") !== "false",
     });

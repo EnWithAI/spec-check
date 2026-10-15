@@ -9,6 +9,86 @@
           "semanticVersion": "0.1.0",
           "rules": [
             {
+              "id": "adr-section-missing",
+              "name": "adr-section-missing",
+              "shortDescription": {
+                "text": "ADR section missing"
+              },
+              "fullDescription": {
+                "text": "The decision record has no status, or no heading for one of the required sections (default: context, decision, consequences)."
+              },
+              "help": {
+                "text": "Add the missing sections so readers can see why the decision was made and what it changes."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "integrity",
+                "status": "verified_static_fact"
+              }
+            },
+            {
+              "id": "adr-status-invalid",
+              "name": "adr-status-invalid",
+              "shortDescription": {
+                "text": "ADR status not in the allowed set"
+              },
+              "fullDescription": {
+                "text": "The status is not one of the configured values, so tools and readers cannot tell if it applies."
+              },
+              "help": {
+                "text": "Use an allowed status (for example accepted or superseded), or add this status to `adr_statuses`."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "integrity",
+                "status": "verified_static_fact"
+              }
+            },
+            {
+              "id": "adr-supersede-dangling",
+              "name": "adr-supersede-dangling",
+              "shortDescription": {
+                "text": "ADR superseded by a record that is not there"
+              },
+              "fullDescription": {
+                "text": "The record points at a replacement that is not among the analyzed ADRs."
+              },
+              "help": {
+                "text": "Fix the link or number, add the replacing ADR, or include its folder in the run."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "integrity",
+                "status": "verified_static_fact"
+              }
+            },
+            {
+              "id": "ai-governance-missing",
+              "name": "ai-governance-missing",
+              "shortDescription": {
+                "text": "AI component without an AI-governance section"
+              },
+              "fullDescription": {
+                "text": "The package uses AI vocabulary but has no AI-governance heading. The default headings are not a compliance claim."
+              },
+              "help": {
+                "text": "Add a section on intended use, evaluation, human oversight, data provenance and fallback, or confirm no AI component is involved."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "coverage",
+                "status": "hypothesis"
+              }
+            },
+            {
               "id": "dangling-reference",
               "name": "dangling-reference",
               "shortDescription": {
@@ -25,6 +105,26 @@
               },
               "properties": {
                 "category": "integrity",
+                "status": "verified_static_fact"
+              }
+            },
+            {
+              "id": "design-package-incomplete",
+              "name": "design-package-incomplete",
+              "shortDescription": {
+                "text": "Required design-package document missing"
+              },
+              "fullDescription": {
+                "text": "No file under the working directory matches the globs of a required document."
+              },
+              "help": {
+                "text": "Add the document, or change `required_documents` if your package does not need it."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "coverage",
                 "status": "verified_static_fact"
               }
             },
@@ -129,6 +229,26 @@
               }
             },
             {
+              "id": "nfr-without-slo",
+              "name": "nfr-without-slo",
+              "shortDescription": {
+                "text": "Service-level NFR without a measurable target"
+              },
+              "fullDescription": {
+                "text": "The requirement names a service-level quality but no number with a percentile, percentage or measurement window."
+              },
+              "help": {
+                "text": "State the target as value + unit + window or percentile, for example \"p95 under 300 ms over 28 days\"."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "verifiability",
+                "status": "hypothesis"
+              }
+            },
+            {
               "id": "open-marker",
               "name": "open-marker",
               "shortDescription": {
@@ -166,6 +286,46 @@
               "properties": {
                 "category": "verifiability",
                 "status": "verified_static_fact"
+              }
+            },
+            {
+              "id": "security-considerations-missing",
+              "name": "security-considerations-missing",
+              "shortDescription": {
+                "text": "No security section in the design package"
+              },
+              "fullDescription": {
+                "text": "None of the package's documents has a heading containing a configured security word. The content of such a section is not assessed."
+              },
+              "help": {
+                "text": "Add a security or threat-model section, or confirm in one that no security concerns apply."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "category": "coverage",
+                "status": "verified_static_fact"
+              }
+            },
+            {
+              "id": "slo-without-sli",
+              "name": "slo-without-sli",
+              "shortDescription": {
+                "text": "SLO without an indicator"
+              },
+              "fullDescription": {
+                "text": "The statement gives an objective but does not say what is measured."
+              },
+              "help": {
+                "text": "Name the indicator, for example \"99.9% of requests succeed over 30 days\"."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "category": "verifiability",
+                "status": "hypothesis"
               }
             },
             {
@@ -254,7 +414,7 @@
       "results": [
         {
           "ruleId": "story-without-scenarios",
-          "ruleIndex": 8,
+          "ruleIndex": 16,
           "level": "warning",
           "message": {
             "text": "User story has no acceptance scenario. Add at least one Given/When/Then acceptance scenario to the story."
@@ -284,7 +444,7 @@
         },
         {
           "ruleId": "vague-term",
-          "ruleIndex": 11,
+          "ruleIndex": 19,
           "level": "note",
           "message": {
             "text": "Vague term \"quickly\" without a measure in FR-002. Add a measurable threshold (for example a latency, count or percentage) or confirm the wording is intended."
@@ -316,7 +476,7 @@
         },
         {
           "ruleId": "dangling-reference",
-          "ruleIndex": 0,
+          "ruleIndex": 4,
           "level": "warning",
           "message": {
             "text": "FR-009 is referenced but not defined. Define the referenced requirement, fix the ID, or include the file that defines it in the run."
@@ -348,7 +508,7 @@
         },
         {
           "ruleId": "needs-clarification",
-          "ruleIndex": 5,
+          "ruleIndex": 10,
           "level": "error",
           "message": {
             "text": "Unresolved clarification in FR-004. Resolve the question with the requirement owner and replace the marker with the decision."
@@ -380,7 +540,7 @@
         },
         {
           "ruleId": "unmeasurable-criterion",
-          "ruleIndex": 10,
+          "ruleIndex": 18,
           "level": "warning",
           "message": {
             "text": "SC-002 has no measurable target. State how success is measured: a target value, a percentage or an all/none condition."

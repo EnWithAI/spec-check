@@ -1,4 +1,4 @@
-# Spec Check — behavior specification (alpha 0.1)
+# Spec Check — behavior specification (0.1, design-package profile 0.2)
 
 Status: written **before** implementation (spec-first, addendum invariant 1). Acceptance tests in
 `test/acceptance/` encode section 7 and were committed failing before the analyzers existed.
@@ -86,6 +86,63 @@ Each finding has: `id` (`<rule>:<sha256-8>` of path, rule and normalized item te
 Unlike Impact Check (which never emits source), quoting the spec line is the point of a spec linter; the redactor
 and escaping still apply.
 
+## 5a. Design-package profile (0.2, opt-in)
+
+Added after 0.1 (Engineering Commons decisions D-079 to D-089). Enabled only by `"profile": "design-package"` in the
+config; without it, reports are byte-identical to 0.1. The profile checks the documents that make up a design package:
+decision records (ADRs), service-level targets, and whether security and AI governance are addressed at all. It checks
+that the sections exist, never whether their content is adequate (limitation `design-package-content`).
+
+**ADR files.** An analyzed file is an ADR when its path matches `design_package.adr_paths` (default
+`doc/adr/*.md`, `docs/adr/*.md`, `docs/decisions/*.md`) and its file name starts with a number (`0001-…`, the
+adr-tools and MADR convention). Index or template files in those folders (`README.md`, `adr-template.md`) are not
+ADRs. Without positional paths, `adr_paths` are added to `include`. An ADR's number is the integer value of that
+leading number.
+
+**ADR status** is read from, in order: front matter `status:` (MADR 3+); a `Status:` line or list item
+(`* Status: accepted`, MADR 2); the first block under a heading starting with "Status" (Nygard, adr-tools). The value
+is its first word, lower-cased, without punctuation or emphasis ("Superseded by …" → `superseded`).
+
+**Design package (unit for the coverage rules).** The non-ADR inputs that share a directory, for example one Spec Kit
+feature folder (`spec.md`, `plan.md`, …). Run with `include` covering every document of the package.
+
+| rule_id                           | category      | status               | severity | fires when                                                                                                                                                                                                                                                                                                                                                                              |
+| --------------------------------- | ------------- | -------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `adr-section-missing`             | integrity     | verified_static_fact | medium   | an ADR has no status (any of the three forms) or no heading starting with one of `design_package.adr_sections` (default `context`, `decision`, `consequences`). One finding per ADR listing every missing section                                                                                                                                                                       |
+| `adr-status-invalid`              | integrity     | verified_static_fact | medium   | the ADR status is not in `design_package.adr_statuses` (default `proposed`, `accepted`, `rejected`, `deprecated`, `superseded`)                                                                                                                                                                                                                                                         |
+| `adr-supersede-dangling`          | integrity     | verified_static_fact | medium   | a "superseded by" line in an ADR links to a file that is not an analyzed ADR, or names `ADR-N` / `ADR N` where no analyzed ADR has number N. Other wording is not interpreted                                                                                                                                                                                                           |
+| `nfr-without-slo`                 | verifiability | hypothesis           | low      | a `non_functional` item mentions a service-level quality (latency, response time, availability, uptime, error rate, throughput, durability, freshness, success rate, a percentile such as `p95`) but has no number, or has a number with neither a percentile/percentage nor a time window                                                                                              |
+| `slo-without-sli`                 | verifiability | hypothesis           | low      | a block (not a heading) that mentions "SLO" and contains a number names no indicator (an "SLI" or one of the service-level qualities above, or "success rate", "requests")                                                                                                                                                                                                              |
+| `security-considerations-missing` | coverage      | verified_static_fact | medium   | a design package has no heading containing one of `design_package.security_headings` (default `security`, `threat`)                                                                                                                                                                                                                                                                     |
+| `ai-governance-missing`           | coverage      | hypothesis           | medium   | a design package uses AI vocabulary (LLM, large language model, generative AI, machine learning, AI model, AI agent, model inference, embeddings, RAG, fine-tuning, foundation model, chatbot, system prompt, prompt injection) but has no heading containing one of `design_package.ai_governance_headings` (default `AI governance`, `responsible AI`, `AI risk`, `model governance`) |
+| `design-package-incomplete`       | coverage      | verified_static_fact | medium   | no file under `--cwd` matches one entry of `design_package.required_documents` (default: `architecture-model`, `decision-records`, `runbook`; see CONFIG.md). One finding per missing entry, evidence on line 1 of the config file                                                                                                                                                      |
+
+Notes:
+
+- "Window": `over`, `per`, `across`, `rolling` or `in any` followed by a duration or a calendar period (`over 28
+days`, `per calendar month`, `rolling 30 days`), an `N-day` window, `30d`/`4w`, or `daily`, `weekly`, `monthly`,
+  `quarterly`. "Within 5 seconds" is a target, not a window. Following the design notes ("value + unit +
+  window/percentile"), "p95 under 300 ms" and "99.9% availability over 30 days" pass; "latency MUST be measured" (no
+  number) and "throughput of 200 requests" (number only) fire. Whether a target is the right one is not judged.
+- The default heading names for AI governance are a starting point and are **not** a compliance claim against the NIST
+  AI RMF, ISO/IEC 42001 or the EU AI Act. Teams should replace them with their own required headings.
+- `design-package-incomplete` lists file names only (no file is read) and never follows symbolic links. It walks at
+  most 20,000 entries under `--cwd`, skipping `node_modules/` and `.git/` (limitation `file-list-cap` when hit).
+- The report schema stays `1.0`: the profile adds rule IDs to the `rule_id` enum and reuses existing categories, so
+  reports without the profile are unchanged and sibling importers (Product Check `--spec-check`) keep working.
+
+**Acceptance scenarios (profile):**
+
+| #   | Fixture                                                                                                                                                                | Expected                                                                                                |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| S14 | clean package: Nygard ADR, MADR 4 ADR (front-matter status), adr-tools supersede link, spec with SLO, security and AI governance headings, architecture model, runbook | 0 findings; policy pass                                                                                 |
+| S15 | ADR without Context and Consequences headings; ADR with no status at all; `README.md` in the ADR folder                                                                | `adr-section-missing` ×2 (README ignored)                                                               |
+| S16 | ADR with status "Approved"; MADR 2 `* Status: accepted` (valid)                                                                                                        | `adr-status-invalid` ×1                                                                                 |
+| S17 | "Superseded by ADR-0009" (missing) and a link to a missing file; a valid "Superseded by ADR-0001"                                                                      | `adr-supersede-dangling` ×2                                                                             |
+| S18 | NFRs: latency without window, availability with % and window (valid), "must comply with GDPR" (not service-level); "SLO: 99.9% over 30 days" without indicator         | `nfr-without-slo` ×1, `slo-without-sli` ×1                                                              |
+| S19 | package with LLM vocabulary, no security heading, no AI-governance heading; second package with neither                                                                | `security-considerations-missing` ×2, `ai-governance-missing` ×1                                        |
+| S20 | repository with no architecture model and no runbook                                                                                                                   | `design-package-incomplete` ×2; the same fixture without the profile has none of the profile's findings |
+
 ## 6. Outputs, commands and exit codes
 
 ```
@@ -129,8 +186,8 @@ Determinism: paths are relative to `--cwd` with `/` separators; findings sorted 
 
 ## 8. Non-goals
 
-Proving a spec is complete or correct; generating specs or code; checking section structure or test traceability
-(DocGuard); executing acceptance criteria (spec-gates); LLM review (a later, opt-in BYOK extension, labelled
+Proving a spec is complete or correct; generating specs or code; checking general section structure or test traceability
+(DocGuard; the opt-in design-package profile checks only ADR sections and security/AI-governance headings); executing acceptance criteria (spec-gates); LLM review (a later, opt-in BYOK extension, labelled
 hypothesis, off by default); non-English lexicons; a 0–100 quality score; cloud storage; telemetry.
 
 ## 9. Misuse cases and threat model (summary; detail in `docs/THREAT_MODEL.md`)

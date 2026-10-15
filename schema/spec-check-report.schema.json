@@ -73,7 +73,15 @@
             "missing-non-functional",
             "duplicate-id",
             "dangling-reference",
-            "missing-owner"
+            "missing-owner",
+            "adr-section-missing",
+            "adr-status-invalid",
+            "adr-supersede-dangling",
+            "nfr-without-slo",
+            "slo-without-sli",
+            "security-considerations-missing",
+            "ai-governance-missing",
+            "design-package-incomplete"
           ]
         },
         "category": {

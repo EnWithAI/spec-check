@@ -25,6 +25,47 @@ export interface Config {
   excerpts: boolean;
   /** Where requirement IDs must be unique: per file (Spec Kit) or across all inputs. */
   idScope: "file" | "set";
+  /** Opt-in rule profile (docs/SPEC.md §5a). */
+  profile: "default" | "design-package";
+  /** Settings of the design-package profile. */
+  designPackage: DesignPackageConfig;
+}
+
+/** Design-package profile settings (docs/CONFIG.md). Heading and status words are lower-case. */
+export interface DesignPackageConfig {
+  adrPaths: string[];
+  adrSections: string[];
+  adrStatuses: string[];
+  securityHeadings: string[];
+  aiGovernanceHeadings: string[];
+  /** Named document globs; null means the defaults, whose `decision-records` entry follows `adrPaths`. */
+  requiredDocuments: Record<string, string[]> | null;
+}
+
+/** Default design-package settings. */
+export const DEFAULT_DESIGN_PACKAGE: DesignPackageConfig = {
+  adrPaths: ["doc/adr/*.md", "docs/adr/*.md", "docs/decisions/*.md"],
+  adrSections: ["context", "decision", "consequences"],
+  adrStatuses: ["proposed", "accepted", "rejected", "deprecated", "superseded"],
+  securityHeadings: ["security", "threat"],
+  aiGovernanceHeadings: ["ai governance", "responsible ai", "ai risk", "model governance"],
+  requiredDocuments: null,
+};
+
+/** Required documents in effect (defaults resolved against the ADR globs). */
+export function requiredDocuments(dp: DesignPackageConfig): Record<string, string[]> {
+  return (
+    dp.requiredDocuments ?? {
+      "architecture-model": [
+        "**/workspace.dsl",
+        "**/workspace.json",
+        "**/*.calm.json",
+        "docs/architecture/**",
+      ],
+      "decision-records": dp.adrPaths,
+      runbook: ["**/runbook*.md", "**/runbooks/**", "docs/operations/**"],
+    }
+  );
 }
 
 /** Defaults used when no config file exists. */
@@ -46,6 +87,8 @@ export const DEFAULT_CONFIG: Config = {
   vagueTermsRemove: [],
   excerpts: true,
   idScope: "file",
+  profile: "default",
+  designPackage: DEFAULT_DESIGN_PACKAGE,
 };
 
 /** Every rule ID Spec Check knows (used to validate `rules` keys and suppression directives). */
@@ -62,6 +105,14 @@ export const RULE_IDS = [
   "duplicate-id",
   "dangling-reference",
   "missing-owner",
+  "adr-section-missing",
+  "adr-status-invalid",
+  "adr-supersede-dangling",
+  "nfr-without-slo",
+  "slo-without-sli",
+  "security-considerations-missing",
+  "ai-governance-missing",
+  "design-package-incomplete",
 ] as const;
 
 const SEVERITIES: readonly string[] = ["high", "medium", "low", "info"];
@@ -78,6 +129,16 @@ const KEYS = [
   "vague_terms",
   "excerpts",
   "id_scope",
+  "profile",
+  "design_package",
+];
+const DESIGN_PACKAGE_KEYS = [
+  "adr_paths",
+  "adr_sections",
+  "adr_statuses",
+  "security_headings",
+  "ai_governance_headings",
+  "required_documents",
 ];
 
 /** Throws a usage error naming the offending config key. */
@@ -102,6 +163,54 @@ function words(value: unknown, key: string): string[] {
   )
     bad(key, "must be an array of plain words (letters, spaces, hyphens)");
   return (value as string[]).map((w) => w.toLowerCase());
+}
+
+/** Validates a required, non-empty list of plain words. */
+function wordList(value: unknown, key: string): string[] {
+  const list = words(value, key);
+  if (list.length === 0 || list.length > 50) bad(key, "must have 1–50 entries");
+  return [...new Set(list)];
+}
+
+/** Validates the `design_package` object. */
+function designPackage(raw: unknown): DesignPackageConfig {
+  if (raw === null || typeof raw !== "object" || Array.isArray(raw))
+    bad("design_package", "must be an object");
+  const obj = raw as Record<string, unknown>;
+  for (const key of Object.keys(obj))
+    if (!DESIGN_PACKAGE_KEYS.includes(key)) bad(`design_package.${key}`, "is not a known key");
+  const dp: DesignPackageConfig = { ...DEFAULT_DESIGN_PACKAGE };
+  if (obj.adr_paths !== undefined) {
+    dp.adrPaths = globs(obj.adr_paths, "design_package.adr_paths");
+    if (dp.adrPaths.length === 0) bad("design_package.adr_paths", "must not be empty");
+  }
+  if (obj.adr_sections !== undefined)
+    dp.adrSections = wordList(obj.adr_sections, "design_package.adr_sections");
+  if (obj.adr_statuses !== undefined)
+    dp.adrStatuses = wordList(obj.adr_statuses, "design_package.adr_statuses");
+  if (obj.security_headings !== undefined)
+    dp.securityHeadings = wordList(obj.security_headings, "design_package.security_headings");
+  if (obj.ai_governance_headings !== undefined)
+    dp.aiGovernanceHeadings = wordList(obj.ai_governance_headings, "design_package.ai_governance_headings");
+  if (obj.required_documents !== undefined) {
+    const docs = obj.required_documents;
+    if (docs === null || typeof docs !== "object" || Array.isArray(docs))
+      bad("design_package.required_documents", "must be an object of name: [globs]");
+    const entries = Object.entries(docs as Record<string, unknown>);
+    if (entries.length > 20) bad("design_package.required_documents", "has too many entries (max 20)");
+    dp.requiredDocuments = {};
+    for (const [name, patterns] of entries) {
+      if (!/^[a-z][a-z0-9-]{0,40}$/.test(name))
+        bad(
+          `design_package.required_documents.${name}`,
+          "must be a lower-case name (letters, digits, hyphens)"
+        );
+      const list = globs(patterns, `design_package.required_documents.${name}`);
+      if (list.length === 0) bad(`design_package.required_documents.${name}`, "must not be empty");
+      dp.requiredDocuments[name] = list;
+    }
+  }
+  return dp;
 }
 
 /** Validates a parsed JSON value and applies defaults. Exported for tests. */
@@ -177,6 +286,15 @@ export function validateConfig(raw: unknown): Config {
   if (obj.id_scope !== undefined) {
     if (obj.id_scope !== "file" && obj.id_scope !== "set") bad("id_scope", 'must be "file" or "set"');
     config.idScope = obj.id_scope;
+  }
+  if (obj.profile !== undefined) {
+    if (obj.profile !== "default" && obj.profile !== "design-package")
+      bad("profile", 'must be "default" or "design-package"');
+    config.profile = obj.profile;
+  }
+  if (obj.design_package !== undefined) {
+    if (config.profile !== "design-package") bad("design_package", 'requires "profile": "design-package"');
+    config.designPackage = designPackage(obj.design_package);
   }
   if (obj.vague_terms !== undefined) {
     const vague = obj.vague_terms as Record<string, unknown>;

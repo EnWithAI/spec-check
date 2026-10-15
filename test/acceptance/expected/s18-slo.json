@@ -1,0 +1,24 @@
+{
+  "args": [],
+  "policy": "pass",
+  "findings": [
+    {
+      "rule_id": "nfr-without-slo",
+      "status": "hypothesis",
+      "severity": "low",
+      "path": "specs/001-search/spec.md",
+      "line_start": 20,
+      "requirement_ids": [
+        "NFR-001"
+      ]
+    },
+    {
+      "rule_id": "slo-without-sli",
+      "status": "hypothesis",
+      "severity": "low",
+      "path": "specs/001-search/spec.md",
+      "line_start": 26,
+      "requirement_ids": []
+    }
+  ]
+}
