@@ -168,3 +168,40 @@ export function discover(cwd: string, paths: string[], include: string[], exclud
   }
   return { files, limitations: skips.toLimitations() };
 }
+
+/** Cap on directory entries listed for `design-package-incomplete` (limitation `file-list-cap`). */
+export const MAX_LISTED_FILES = 20_000;
+
+/**
+ * Lists file paths under cwd (names only, nothing is read), sorted, without following symlinks and skipping
+ * node_modules and .git. Used only by the design-package profile.
+ */
+export function listFiles(cwd: string): { paths: string[]; capped: boolean } {
+  const out: string[] = [];
+  let capped = false;
+  const visit = (dir: string, depth: number): void => {
+    if (depth > LIMITS.maxDepth || capped) return;
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    entries.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    for (const entry of entries) {
+      if (entry.isSymbolicLink()) continue;
+      const full = resolve(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (!SKIP_DIRS.has(entry.name)) visit(full, depth + 1);
+      } else if (entry.isFile()) {
+        if (out.length >= MAX_LISTED_FILES) {
+          capped = true;
+          return;
+        }
+        out.push(display(cwd, full));
+      }
+    }
+  };
+  visit(cwd, 0);
+  return { paths: out.sort(), capped };
+}

@@ -5,7 +5,7 @@
  * configuration loading, output writing and the mapping of every error to a documented exit code.
  */
 import { existsSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
-import { dirname, isAbsolute, join, resolve } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { parseArgs } from "node:util";
 import { analyze } from "../analyze.js";
 import { DEFAULT_CONFIG, loadConfigFile, type Config } from "../config.js";
@@ -144,9 +144,12 @@ async function main(argv: string[], io: CliIO): Promise<number> {
 
   let config: Config = DEFAULT_CONFIG;
   let configSource = "defaults";
+  let configPath = ".spec-check.json";
   if (values.config !== undefined) {
     configSource = "--config";
-    config = loadConfigFile(isAbsolute(values.config) ? values.config : resolve(io.cwd, values.config));
+    const file = isAbsolute(values.config) ? values.config : resolve(io.cwd, values.config);
+    configPath = relative(cwd, file).split(sep).join("/");
+    config = loadConfigFile(file);
   } else if (existsSync(join(cwd, ".spec-check.json"))) {
     configSource = ".spec-check.json";
     config = loadConfigFile(join(cwd, ".spec-check.json"));
@@ -157,6 +160,7 @@ async function main(argv: string[], io: CliIO): Promise<number> {
     paths,
     config,
     configSource,
+    configPath,
     policy: command === "check",
     excerpts: config.excerpts && !values["no-excerpts"],
     ...(io.now ? { now: io.now } : {}),

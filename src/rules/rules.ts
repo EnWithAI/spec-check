@@ -162,6 +162,95 @@ export const RULES: Record<string, RuleInfo> = {
       "Neither an `owner` front-matter key nor an **Owner**: line names who decides open questions.",
     action: "Add `owner:` front matter or an **Owner**: line.",
   },
+  // Design-package profile (docs/SPEC.md §5a); these run only with `"profile": "design-package"`.
+  "adr-section-missing": {
+    id: "adr-section-missing",
+    category: "integrity",
+    status: "verified_static_fact",
+    severity: "medium",
+    confidence: "high",
+    title: "ADR section missing",
+    explanation:
+      "The decision record has no status, or no heading for one of the required sections (default: context, decision, consequences).",
+    action: "Add the missing sections so readers can see why the decision was made and what it changes.",
+  },
+  "adr-status-invalid": {
+    id: "adr-status-invalid",
+    category: "integrity",
+    status: "verified_static_fact",
+    severity: "medium",
+    confidence: "high",
+    title: "ADR status not in the allowed set",
+    explanation:
+      "The status is not one of the configured values, so tools and readers cannot tell if it applies.",
+    action:
+      "Use an allowed status (for example accepted or superseded), or add this status to `adr_statuses`.",
+  },
+  "adr-supersede-dangling": {
+    id: "adr-supersede-dangling",
+    category: "integrity",
+    status: "verified_static_fact",
+    severity: "medium",
+    confidence: "high",
+    title: "ADR superseded by a record that is not there",
+    explanation: "The record points at a replacement that is not among the analyzed ADRs.",
+    action: "Fix the link or number, add the replacing ADR, or include its folder in the run.",
+  },
+  "nfr-without-slo": {
+    id: "nfr-without-slo",
+    category: "verifiability",
+    status: "hypothesis",
+    severity: "low",
+    confidence: "medium",
+    title: "Service-level NFR without a measurable target",
+    explanation:
+      "The requirement names a service-level quality but no number with a percentile, percentage or measurement window.",
+    action:
+      'State the target as value + unit + window or percentile, for example "p95 under 300 ms over 28 days".',
+  },
+  "slo-without-sli": {
+    id: "slo-without-sli",
+    category: "verifiability",
+    status: "hypothesis",
+    severity: "low",
+    confidence: "medium",
+    title: "SLO without an indicator",
+    explanation: "The statement gives an objective but does not say what is measured.",
+    action: 'Name the indicator, for example "99.9% of requests succeed over 30 days".',
+  },
+  "security-considerations-missing": {
+    id: "security-considerations-missing",
+    category: "coverage",
+    status: "verified_static_fact",
+    severity: "medium",
+    confidence: "high",
+    title: "No security section in the design package",
+    explanation:
+      "None of the package's documents has a heading containing a configured security word. The content of such a section is not assessed.",
+    action: "Add a security or threat-model section, or confirm in one that no security concerns apply.",
+  },
+  "ai-governance-missing": {
+    id: "ai-governance-missing",
+    category: "coverage",
+    status: "hypothesis",
+    severity: "medium",
+    confidence: "medium",
+    title: "AI component without an AI-governance section",
+    explanation:
+      "The package uses AI vocabulary but has no AI-governance heading. The default headings are not a compliance claim.",
+    action:
+      "Add a section on intended use, evaluation, human oversight, data provenance and fallback, or confirm no AI component is involved.",
+  },
+  "design-package-incomplete": {
+    id: "design-package-incomplete",
+    category: "coverage",
+    status: "verified_static_fact",
+    severity: "medium",
+    confidence: "high",
+    title: "Required design-package document missing",
+    explanation: "No file under the working directory matches the globs of a required document.",
+    action: "Add the document, or change `required_documents` if your package does not need it.",
+  },
 };
 
 /** A rule result before IDs, suppressions and sorting. */

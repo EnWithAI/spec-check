@@ -128,3 +128,29 @@ export function vagueMatcher(terms: readonly string[]): RegExp {
     .map((t) => t.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&").replace(/ /g, "\\s+"));
   return new RegExp(`(?<![\\w-])(${escaped.join("|")})(?![\\w-])`, "gi");
 }
+
+/** Service-level qualities that call for a target (design-package profile, `nfr-without-slo`). */
+export const SERVICE_LEVEL =
+  /\b(latency|latencies|response times?|availability|uptime|error rates?|throughput|durability|freshness|success rates?|p\d{2,3}(?:\.\d+)?|percentile)\b/i;
+
+/** A percentile or a percentage. */
+export const PERCENT_OR_PERCENTILE =
+  /\d(?:[.,]\d+)?\s*%|\bper ?cent\b|\bp\d{2,3}(?:\.\d+)?\b|\bpercentile\b/i;
+
+/** A measurement window ("over 28 days", "per calendar month", "30-day", "30d", "monthly"). "Within" is a target. */
+export const WINDOW = new RegExp(
+  [
+    "\\b(over|per|across|rolling|in any)\\s+(?:(?:a|an|the|each|any|every|calendar|rolling|trailing)\\s+)*(?:\\d+[- ]?)?(?:minutes?|hours?|days?|weeks?|months?|quarters?|years?)\\b",
+    "\\b\\d+-(?:minute|hour|day|week|month)\\b",
+    "\\b\\d+[dw]\\b",
+    "\\b(daily|weekly|monthly|quarterly|annually)\\b",
+  ].join("|"),
+  "i"
+);
+
+/** Words that name a measured indicator (`slo-without-sli`). */
+export const INDICATOR = new RegExp(`${SERVICE_LEVEL.source}|\\b(SLIs?|indicators?|requests?)\\b`, "i");
+
+/** Vocabulary that suggests an AI component (`ai-governance-missing`). */
+export const AI_VOCABULARY =
+  /\b(LLMs?|large language models?|generative AI|GenAI|machine[- ]learning|ML models?|AI models?|AI agents?|model inference|embeddings|RAG|retrieval[- ]augmented|fine[- ]tun(?:e|ed|ing)|foundation models?|chatbots?|system prompts?|prompt injection)\b/i;
