@@ -15,6 +15,37 @@ A complete example: [`.spec-check.example.json`](../.spec-check.example.json).
 | `require_owner`               | `false`                                                                            | Enables `missing-owner` (front matter `owner:` or an `**Owner**:` line).                                    |
 | `vague_terms.add` / `.remove` | `[]`                                                                               | Plain words added to or removed from the vague-term list.                                                   |
 | `excerpts`                    | `true`                                                                             | Quote offending lines (also `--no-excerpts`).                                                               |
+| `profile`                     | `"default"`                                                                        | `"design-package"` enables the eight design-package rules (below).                                          |
+| `design_package`              | see below                                                                          | Settings of the design-package profile; rejected unless `profile` is `"design-package"`.                    |
+
+## Design-package profile
+
+Opt-in rules for the documents that make up a design package: ADRs, service-level targets, and whether security and
+AI governance are addressed ([SPEC.md §5a](SPEC.md)). They check that sections exist, not whether their content is
+good. Heading and status words are plain words, matched case-insensitively.
+
+| `design_package.` key    | Default                                                             | Meaning                                                                                                                                |
+| ------------------------ | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `adr_paths`              | `doc/adr/*.md`, `docs/adr/*.md`, `docs/decisions/*.md`              | ADR globs. Files here whose name starts with a number are ADRs; all files here are left out of the package rules. Added to `include`.  |
+| `adr_sections`           | `context`, `decision`, `consequences`                               | Headings every ADR needs (a heading that starts with the word counts, so MADR's "Decision Outcome" passes). Status is always required. |
+| `adr_statuses`           | `proposed`, `accepted`, `rejected`, `deprecated`, `superseded`      | Allowed first word of the ADR status.                                                                                                  |
+| `security_headings`      | `security`, `threat`                                                | A heading containing one of these satisfies `security-considerations-missing`.                                                         |
+| `ai_governance_headings` | `ai governance`, `responsible ai`, `ai risk`, `model governance`    | A heading containing one of these satisfies `ai-governance-missing`. Not a compliance claim; use your organization's headings.         |
+| `required_documents`     | `architecture-model`, `decision-records` (= `adr_paths`), `runbook` | `{ "name": ["glob", …] }`. Replaces the defaults; `{}` turns the check off. Only file names are listed; nothing is read.               |
+
+Default `required_documents` globs: `architecture-model`: `**/workspace.dsl`, `**/workspace.json`, `**/*.calm.json`,
+`docs/architecture/**`; `runbook`: `**/runbook*.md`, `**/runbooks/**`, `docs/operations/**`.
+
+```json
+{
+  "profile": "design-package",
+  "include": ["specs/*/*.md"],
+  "design_package": { "required_documents": { "architecture-model": ["docs/architecture/workspace.dsl"] } }
+}
+```
+
+A design package is the set of analyzed non-ADR files in one directory, so set `include` to cover every document of a
+Spec Kit feature (`specs/*/*.md`), not only `spec.md`.
 
 ## Per-file controls
 

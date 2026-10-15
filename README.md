@@ -71,6 +71,12 @@ spec-check rules                          # the rule catalog
 
 **Default policy:** `check` fails only on **verified, high-severity** findings: unresolved clarifications, template placeholders and duplicate IDs. Hypotheses inform and never block unless you opt in. See [docs/CONFIG.md](docs/CONFIG.md) to change the policy, re-rank or disable rules, add requirement ID prefixes or vague terms, or require an owner.
 
+**Design-package profile (opt-in).** Set `"profile": "design-package"` to also check decision records (ADR sections,
+status, "superseded by" links), service-level NFRs and SLOs (a target with a percentile or window, a named indicator),
+whether each design package has a security section and, when it mentions LLMs or other AI components, an
+AI-governance section, and whether required documents such as an architecture model or runbook exist. These rules check
+that the sections are there, not whether they are good. See [docs/CONFIG.md](docs/CONFIG.md#design-package-profile).
+
 **Suppressing a finding** is always visible in the report:
 
 ```markdown
@@ -104,7 +110,7 @@ The Action writes `spec-check-report/spec-check-report.{json,md,sarif}` and a jo
 ## What Spec Check does not do
 
 - It does not prove a spec is complete or correct. A clean report means none of these rules fired, nothing more.
-- It does not check section structure or requirement-to-test traceability. [DocGuard](https://github.com/raccioly/docguard) already does that; use both.
+- It does not check general section structure or requirement-to-test traceability. [DocGuard](https://github.com/raccioly/docguard) already does that; use both. The opt-in design-package profile checks only ADR sections and security/AI-governance headings.
 - It does not execute acceptance criteria and does not call any AI model. Optional, opt-in model review may come later and will be labelled as hypothesis.
 - Word lists are English only. Markdown support is a documented subset (no setext headings or HTML blocks).
 

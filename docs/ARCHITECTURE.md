@@ -6,6 +6,7 @@ action/run.ts ┴─ analyze.ts ─┬─ input/discover.ts   (files: lstat, no 
                              ├─ parse/markdown.ts   (front matter, comments, fences, headings, items)
                              ├─ parse/spec.ts       (requirements, IDs, references, scenarios, stories)
                              ├─ rules/rules.ts      (catalog + 12 rules) ← rules/lexicon.ts
+                             ├─ rules/design.ts     (8 opt-in design-package rules; file-name listing for required documents)
                              ├─ policy.ts           (check)
                              └─ report/{markdown,sarif,escape,redact}.ts
 ```
