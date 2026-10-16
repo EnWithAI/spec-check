@@ -73,4 +73,4 @@ Action: State how success is measured: a target value, a percentage or an all/no
 - `english-lexicon` — Vague-term, measure and coverage heuristics use English word lists.
 - `not-checked` — Section structure, requirement-to-test traceability and logical completeness are not checked. A clean report does not mean the spec is complete or correct.
 
-<sub>Spec Check 0.1.0 · offline · no code executed · no model used. An EnWithAI Engineering Commons tool · [crewpe.ai](https://crewpe.ai)</sub>
+<sub>Spec Check 0.2.0 · offline · no code executed · no model used. An EnWithAI Engineering Commons tool · [crewpe.ai](https://crewpe.ai)</sub>

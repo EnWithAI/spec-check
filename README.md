@@ -14,7 +14,7 @@ Spec Check reads Markdown specs (with first-class support for [GitHub Spec Kit](
 
 Every finding has a `status`: `verified_static_fact` (a structural fact, such as a marker that is present) or `hypothesis` (a word-list judgement a human should confirm). Each also has the file and line, a short quote of the line, and a `recommended_human_action`. You also get a requirements inventory (every `FR-`/`NFR-`/`SC-` item, its references and its findings) as JSON, Markdown or SARIF. There is no 0–100 quality score.
 
-> Status: **early release** (`0.1.0`, pre-1.0, report schema 1.0). Published on npm as [`@enwithai/spec-check`](https://www.npmjs.com/package/@enwithai/spec-check); see [Install](#install).
+> Status: **early release** (`0.2.0`, pre-1.0, report schema 1.0). Published on npm as [`@enwithai/spec-check`](https://www.npmjs.com/package/@enwithai/spec-check); see [Install](#install).
 
 ## 60-second demo
 

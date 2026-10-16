@@ -5,12 +5,15 @@ minor versions may break the report schema, which carries its own `schema_versio
 
 ## Unreleased
 
+## 0.2.0 — 2026-10-15
+
 - **Design-package profile (opt-in, `"profile": "design-package"`).** Eight rules: `adr-section-missing`,
   `adr-status-invalid`, `adr-supersede-dangling`, `nfr-without-slo`, `slo-without-sli`,
   `security-considerations-missing`, `ai-governance-missing` and `design-package-incomplete`, configured under
   `design_package`. Presence checks only (limitation `design-package-content`). Acceptance scenarios S14–S20.
 - Report schema stays `1.0`: the `rule_id` enum gains the eight IDs; categories are unchanged. Without the profile,
   JSON and Markdown reports are unchanged; SARIF output lists the new rules in its rule metadata.
+- Code of Conduct names the project correctly (fixed on GitHub in #1; now in the npm package).
 
 ## 0.1.0 — 2026-10-12
 
