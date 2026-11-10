@@ -6,7 +6,7 @@
       "tool": {
         "driver": {
           "name": "spec-check",
-          "semanticVersion": "0.2.0",
+          "semanticVersion": "0.3.261110",
           "rules": [
             {
               "id": "adr-section-missing",
